@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:rent_a_tool_sample/data/request_notifier.dart';
-import 'package:rent_a_tool_sample/extras/shared_pref.dart';
-import 'package:rent_a_tool_sample/models/user_item.dart';
-import 'package:rent_a_tool_sample/widgets/custom_text_field.dart';
 
+import '../data/request_notifier.dart';
 import '../extras/extensions.dart';
+import '../extras/shared_pref.dart';
+import '../models/user_item.dart';
 import '../screens/registration_page.dart';
 import '../widgets/custom_text_button.dart';
+import '../widgets/custom_text_field.dart';
 import '../widgets/gradient_raised_button.dart';
 import '../widgets/password_text_field.dart';
 import '../widgets/sign_up_button.dart';
@@ -21,18 +21,68 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   double _mediaQuerySizeH;
   double _mediaQuerySizeW;
-  TextEditingController _email = TextEditingController();
-  TextEditingController _password = TextEditingController();
+  TextEditingController _emailController = TextEditingController();
+  TextEditingController _passwordController = TextEditingController();
+  String _email;
+  String _password;
   RequestNotifier _auth;
   bool _loading = false;
+  final _formKey = GlobalKey<FormState>();
+  String _emailErrorMessage = "";
+  String _passwordErrorMessage = "";
+  bool _isEmailError = false;
+  bool _isPasswordError = false;
 
-  void _onLoginClicked() {
+  void _onLoginClicked() async {
+    /*if (_emailController.text.toString().isEmpty) {
+      _emailErrorMessage = "Please enter email field.";
+      setState(() {
+        _isEmailError = true;
+      });
+      return;
+    }
+    if (_passwordController.text.toString().isEmpty) {
+      _passwordErrorMessage = "Please enter password field.";
+      setState(() {
+        _isPasswordError = true;
+      });
+      return;
+    }
+    if (_emailController.text.toString().isNotEmpty) {
+      if (!_emailController.text.toString().isValidEmail()) {
+        _emailErrorMessage = "Please enter valid email.";
+        setState(() {
+          _isEmailError = true;
+        });
+        return;
+      }
+      setState(() {
+        _isEmailError = false;
+      });
+    }
+    if (_passwordController.text.toString().isNotEmpty) {
+      if (_passwordController.text.toString().length > 1 &&
+          _passwordController.text.toString().length < 7) {
+        _passwordErrorMessage = "Please enter at lease 7 character password.";
+        setState(() {
+          _isPasswordError = true;
+        });
+        return;
+      }
+      setState(() {
+        _isPasswordError = false;
+      });
+    }
     setState(() {
+      _isEmailError = false;
+      _isPasswordError = false;
       _loading = true;
-      _auth
-          .login(_email.text.toString(), _password.text.toString())
-          .then((response) {
-        _loading = false;
+    });*/
+    if (_formKey.currentState.validate()) {
+      _auth.login(_email, _password).then((response) {
+        setState(() {
+          _loading = false;
+        });
         if (response["status"]) {
           print(response["message"]);
           preferences.putBool(SharedPreference.IS_LOGGED_IN, true);
@@ -44,11 +94,12 @@ class _LoginPageState extends State<LoginPage> {
               MaterialPageRoute(
                   builder: (context) => Dashboard(), maintainState: false));
         } else {
-          ScaffoldMessenger.of(context)
-              .showSnackBar(SnackBar(content: Text(response["message"])));
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text(response["message"]),
+          ));
         }
       });
-    });
+    }
   }
 
   void _onForgotPasswordClicked() {
@@ -68,23 +119,14 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    _mediaQuerySizeH = MediaQuery
-        .of(context)
-        .size
-        .height;
-    _mediaQuerySizeW = MediaQuery
-        .of(context)
-        .size
-        .width;
+    _mediaQuerySizeH = MediaQuery.of(context).size.height;
+    _mediaQuerySizeW = MediaQuery.of(context).size.width;
     _auth = Provider.of<RequestNotifier>(context);
 
     return Scaffold(
       body: Stack(children: [
         Container(
-          height: MediaQuery
-              .of(context)
-              .size
-              .height,
+          height: MediaQuery.of(context).size.height,
           color: Color(0xFFFEF8F6),
         ),
         Positioned(
@@ -102,39 +144,77 @@ class _LoginPageState extends State<LoginPage> {
               alignment: Alignment.topCenter,
               margin: EdgeInsets.symmetric(
                   vertical: _mediaQuerySizeH * 0.01, horizontal: 20),
-              child: Column(
-                children: [
-                  "assets/images/logo.png".appLogo(
-                      w: _mediaQuerySizeW * 0.2, h: _mediaQuerySizeH * 0.2),
-                  (_mediaQuerySizeH * 0.01).addHSpace(),
-                  Text(
-                    "Sign in",
-                    style: Theme
-                        .of(context)
-                        .textTheme
-                        .bodyText1,
-                  ),
-                  (_mediaQuerySizeH * 0.06).addHSpace(),
-                  CustomTextField(
-                    controller: _email,
-                    text: "Email Address",
-                    imageName: "assets/images/email.png",
-                    inputType: TextInputType.emailAddress,
-                  ),
-                  5.addHSpace(),
-                  PasswordTextField(_password, "Password"),
-                  (_mediaQuerySizeH * 0.04).addHSpace(),
-                  GradientRaisedButton("Sign in", _onLoginClicked),
-                  CustomTextButton(
-                      "Forgot Password?", _onForgotPasswordClicked),
-                  (_mediaQuerySizeH * 0.12).addHSpace(),
-                  "- OR -".buttonText(isBold: false, color: Color(0xFF3E454F)),
-                  (_mediaQuerySizeH * 0.02).addHSpace(),
-                  SignUpButton(
-                      text: "Don't have an Account ?",
-                      subText: " Sign up",
-                      onSignUpClicked: _onSignUpClicked)
-                ],
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  children: [
+                    "assets/images/logo.png".appLogo(
+                        w: _mediaQuerySizeW * 0.2, h: _mediaQuerySizeH * 0.2),
+                    (_mediaQuerySizeH * 0.01).addHSpace(),
+                    Text(
+                      "Sign in",
+                      style: Theme.of(context).textTheme.bodyText1,
+                    ),
+                    (_mediaQuerySizeH * 0.06).addHSpace(),
+                    CustomTextField(
+                      controller: _emailController,
+                      text: "Email Address",
+                      imageName: "assets/images/email.png",
+                      inputType: TextInputType.emailAddress,
+                      validator: (String value) {
+                        if (value.isEmpty) {
+                          return "Please enter email.";
+                        } else {
+                          if (!value.isValidEmail()) {
+                            return "Please enter valid email.";
+                          }
+                        }
+                        return null;
+                      },
+                      onSaved: (String value) {
+                        _email = value;
+                      },
+                    ),
+                    Visibility(
+                      child: _emailErrorMessage.errorText(),
+                      visible: _isEmailError,
+                    ),
+                    5.addHSpace(),
+                    PasswordTextField(
+                      controller: _passwordController,
+                      text: "Password",
+                      validator: (String value) {
+                        if (value.isEmpty) {
+                          return "Please enter password.";
+                        } else {
+                          if (value.length < 7) {
+                            return "Please enter at least 7 character password.";
+                          }
+                        }
+                        return null;
+                      },
+                      onSaved: (String value) {
+                        _email = value;
+                      },
+                    ),
+                    Visibility(
+                      child: _passwordErrorMessage.errorText(),
+                      visible: _isPasswordError,
+                    ),
+                    (_mediaQuerySizeH * 0.04).addHSpace(),
+                    GradientRaisedButton("Sign in", _onLoginClicked),
+                    CustomTextButton(
+                        "Forgot Password?", _onForgotPasswordClicked),
+                    (_mediaQuerySizeH * 0.12).addHSpace(),
+                    "- OR -"
+                        .buttonText(isBold: false, color: Color(0xFF3E454F)),
+                    (_mediaQuerySizeH * 0.02).addHSpace(),
+                    SignUpButton(
+                        text: "Don't have an Account ?",
+                        subText: " Sign up",
+                        onButtonClicked: _onSignUpClicked)
+                  ],
+                ),
               ),
             ),
           ),

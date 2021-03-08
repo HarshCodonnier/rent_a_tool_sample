@@ -102,9 +102,9 @@ class _RegistrationPageState extends State<RegistrationPage> {
                   inputType: TextInputType.emailAddress,
                 ),
                 5.addHSpace(),
-                PasswordTextField(_password, "Password"),
+                PasswordTextField(text: "Password"),
                 5.addHSpace(),
-                PasswordTextField(_confirmPassword, "Confirm Password"),
+                PasswordTextField(text: "Confirm Password"),
                 (_mediaQuerySizeH * 0.03).addHSpace(),
                 GradientRaisedButton("Sign up", _onSingUpClicked),
                 (_mediaQuerySizeH * 0.03).addHSpace(),
@@ -113,7 +113,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                 SignUpButton(
                     text: "Already have an Account ?",
                     subText: " Sign in",
-                    onSignUpClicked: _onSingInClicked)
+                    onButtonClicked: _onSingInClicked)
               ]),
             ),
           ),

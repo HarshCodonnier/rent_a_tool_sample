@@ -2,14 +2,27 @@ import 'package:flutter/material.dart';
 
 import '../extras/extensions.dart';
 
-class CustomTextField extends StatelessWidget {
+class CustomTextField extends StatefulWidget {
   final TextEditingController controller;
   final String text;
   final String imageName;
-  TextInputType inputType = TextInputType.text;
+  final TextInputType inputType;
+  final FormFieldValidator<String> validator;
+  final Function onSaved;
 
-  CustomTextField({this.controller, this.text, this.imageName, this.inputType});
+  CustomTextField(
+      {this.controller,
+      this.text,
+      this.imageName,
+      this.inputType,
+      this.validator,
+      this.onSaved});
 
+  @override
+  _CustomTextFieldState createState() => _CustomTextFieldState();
+}
+
+class _CustomTextFieldState extends State<CustomTextField> {
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -18,15 +31,19 @@ class CustomTextField extends StatelessWidget {
       ),
       child: Card(
         shape: 8.cardRadius(),
-        child: TextField(
-          controller: controller,
+        child: TextFormField(
+          controller: widget.controller,
           style: 12.textFieldText(),
-          cursorColor: Theme.of(context).cursorColor,
+          cursorColor: Theme.of(context).textSelectionTheme.cursorColor,
           decoration: InputDecoration(
-              border: InputBorder.none,
-              labelText: text,
-              prefixIcon: imageName.textFieldPrefixIcon()),
-          keyboardType: inputType,
+            border: InputBorder.none,
+            labelText: widget.text,
+            prefixIcon: widget.imageName.textFieldPrefixIcon(),
+          ),
+          keyboardType:
+              widget.inputType == null ? TextInputType.text : widget.inputType,
+          validator: widget.validator,
+          onSaved: widget.onSaved,
         ),
         shadowColor: Color(0xFFFCF1DE),
       ),

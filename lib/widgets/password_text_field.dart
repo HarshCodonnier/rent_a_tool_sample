@@ -5,8 +5,10 @@ import '../extras/extensions.dart';
 class PasswordTextField extends StatefulWidget {
   final TextEditingController controller;
   final String text;
+  final FormFieldValidator<String> validator;
+  final Function onSaved;
 
-  PasswordTextField(this.controller, this.text);
+  PasswordTextField({this.controller, this.text, this.validator, this.onSaved});
 
   @override
   _PasswordTextFieldState createState() => _PasswordTextFieldState();
@@ -26,7 +28,7 @@ class _PasswordTextFieldState extends State<PasswordTextField> {
       ),
       child: Card(
         shape: 8.cardRadius(),
-        child: TextField(
+        child: TextFormField(
           controller: widget.controller,
           style: 12.textFieldText(),
           obscureText: !_isPasswordShow,
@@ -45,8 +47,11 @@ class _PasswordTextFieldState extends State<PasswordTextField> {
                     _isPasswordShow = !_isPasswordShow;
                   });
                 },
-              )),
+              ),
+          ),
           keyboardType: TextInputType.text,
+          validator: widget.validator,
+          onSaved: widget.onSaved,
         ),
         shadowColor: Color(0xFFFCF1DE),
       ),

@@ -5,17 +5,15 @@ import '../extras/extensions.dart';
 class SignUpButton extends StatelessWidget {
   final String text;
   final String subText;
-  final Function onSignUpClicked;
+  final Function onButtonClicked;
 
-  SignUpButton({this.text, this.subText,this.onSignUpClicked});
+  SignUpButton({this.text, this.subText, this.onButtonClicked});
 
   @override
   Widget build(BuildContext context) {
     return Container(
       width: MediaQuery.of(context).size.width,
-      child: RaisedButton(
-        color: Colors.white,
-        onPressed: onSignUpClicked,
+      child: ElevatedButton(
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -23,9 +21,17 @@ class SignUpButton extends StatelessWidget {
             subText.buttonText(isBold: false, color: Color(0xFFFE5210))
           ],
         ),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-          side: BorderSide(width: 1, color: Color(0xFFFE5210)),
+        onPressed: onButtonClicked,
+        style: ElevatedButton.styleFrom(
+          primary: Colors.white,
+          onPrimary: Theme.of(context).primaryColor,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+            side: BorderSide(
+              width: 1,
+              color: Color(0xFFFE5210),
+            ),
+          ),
         ),
       ),
     );
