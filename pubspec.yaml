@@ -30,6 +30,7 @@ dependencies:
   shared_preferences: ^2.0.3
   device_info: ^2.0.0
   package_info: ^2.0.0
+  flutter_easyloading: ^2.2.2
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -57,6 +58,7 @@ flutter:
     - assets/images/email.png
     - assets/images/password.png
     - assets/images/user.png
+    - assets/images/placeholder.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

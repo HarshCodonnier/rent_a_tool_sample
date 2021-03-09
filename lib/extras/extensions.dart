@@ -7,6 +7,12 @@ extension sizedBox on double {
       height: this,
     );
   }
+
+  addWSpace() {
+    return SizedBox(
+      width: this,
+    );
+  }
 }
 
 extension textSize on int {
@@ -59,7 +65,7 @@ extension text on String {
 
   textFieldPrefixIcon() {
     return Padding(
-      padding: EdgeInsets.all(14),
+      padding: EdgeInsets.all(12),
       child: Image.asset(
         this,
         height: 5,
@@ -83,6 +89,14 @@ extension text on String {
   }
 
   isValidEmail() {
-    return RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+").hasMatch(this);
+    return RegExp(
+            r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+        .hasMatch(this);
   }
+}
+
+class Routes {
+  static const String defaultRoute = "/";
+  static const String registrationRoute = "/registration";
+  static const String dashboardRoute = "/dashboard";
 }

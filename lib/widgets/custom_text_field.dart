@@ -8,7 +8,7 @@ class CustomTextField extends StatefulWidget {
   final String imageName;
   final TextInputType inputType;
   final FormFieldValidator<String> validator;
-  final Function onSaved;
+  final FormFieldSetter<String> onSaved;
 
   CustomTextField(
       {this.controller,
@@ -33,7 +33,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
         shape: 8.cardRadius(),
         child: TextFormField(
           controller: widget.controller,
-          style: 12.textFieldText(),
+          style: 16.textFieldText(),
           cursorColor: Theme.of(context).textSelectionTheme.cursorColor,
           decoration: InputDecoration(
             border: InputBorder.none,

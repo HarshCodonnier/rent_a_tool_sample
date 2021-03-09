@@ -1,12 +1,16 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import 'package:rent_a_tool_sample/extras/shared_pref.dart';
 
 import 'data/request_notifier.dart';
+import 'extras/extensions.dart';
+import 'extras/shared_pref.dart';
 import 'models/user_item.dart';
+import 'screens/dashboard.dart';
 import 'screens/login_page.dart';
+import 'screens/registration_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -19,7 +23,6 @@ class MyApp extends StatelessWidget {
   // This widget is the root of rent-a-tool-sample application.
   @override
   Widget build(BuildContext context) {
-
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) => RequestNotifier()),
@@ -28,23 +31,32 @@ class MyApp extends StatelessWidget {
         )
       ],
       child: MaterialApp(
+        initialRoute: preferences.getBool(SharedPreference.IS_LOGGED_IN)
+            ? Routes.dashboardRoute
+            : Routes.defaultRoute,
+        routes: {
+          Routes.defaultRoute: (context) => LoginPage(),
+          Routes.registrationRoute: (context) => RegistrationPage(),
+          Routes.dashboardRoute: (context) => Dashboard(),
+        },
+        builder: EasyLoading.init(),
         title: 'Flutter Demo',
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
-            primaryColor: Color(0XFF8B8F95),
-            splashColor: Color(0x803E454F),
-            visualDensity: VisualDensity.adaptivePlatformDensity,
-            textTheme: Theme.of(context).textTheme.copyWith(
-                  bodyText1: GoogleFonts.muli(
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF3E454F),
-                    fontSize: 20,
-                  ),
+          primaryColor: Color(0XFF8B8F95),
+          splashColor: Color(0x803E454F),
+          visualDensity: VisualDensity.adaptivePlatformDensity,
+          textTheme: Theme.of(context).textTheme.copyWith(
+                bodyText1: GoogleFonts.muli(
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF3E454F),
+                  fontSize: 20,
                 ),
-            textSelectionTheme: Theme.of(context).textSelectionTheme.copyWith(
-                  cursorColor: Color(0XFF8B8F95),
-                )),
-        home: LoginPage(),
+              ),
+          textSelectionTheme: Theme.of(context).textSelectionTheme.copyWith(
+                cursorColor: Color(0XFF8B8F95),
+              ),
+        ),
       ),
     );
   }

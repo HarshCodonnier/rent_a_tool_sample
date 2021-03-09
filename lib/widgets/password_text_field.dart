@@ -6,7 +6,7 @@ class PasswordTextField extends StatefulWidget {
   final TextEditingController controller;
   final String text;
   final FormFieldValidator<String> validator;
-  final Function onSaved;
+  final FormFieldSetter<String> onSaved;
 
   PasswordTextField({this.controller, this.text, this.validator, this.onSaved});
 
@@ -30,7 +30,7 @@ class _PasswordTextFieldState extends State<PasswordTextField> {
         shape: 8.cardRadius(),
         child: TextFormField(
           controller: widget.controller,
-          style: 12.textFieldText(),
+          style: 16.textFieldText(),
           obscureText: !_isPasswordShow,
           cursorColor: _theme.textSelectionTheme.cursorColor,
           decoration: InputDecoration(

@@ -35,7 +35,8 @@ class RequestNotifier with ChangeNotifier {
     };
     String queryString = Uri(queryParameters: queryParameters).query;
     String requestUrl = AppUrls.BASE_URL + queryString;
-    return BaseApiHelper.postRequest(requestUrl, requestData);
+    return BaseApiHelper.postRequest(requestUrl, requestData,
+        passAuthToken: false);
   }
 
   Future<Map<String, dynamic>> register(
@@ -56,6 +57,23 @@ class RequestNotifier with ChangeNotifier {
     };
     String queryString = Uri(queryParameters: queryParameters).query;
     String requestUrl = AppUrls.BASE_URL + queryString;
+    return BaseApiHelper.postRequest(requestUrl, requestData,
+        passAuthToken: false);
+  }
+
+  Future<Map<String, dynamic>> getAgentList(
+      int page, int limit, String search) async {
+    final Map<String, dynamic> requestData = {
+      "page": page,
+      "limit": limit,
+      "search": search
+    };
+
+    notifyListeners();
+
+    var queryParameters = {RequestParam.service: MethodNames.agentList};
+    String queryString = Uri(queryParameters: queryParameters).query;
+    String requestUrl = AppUrls.CONTAINER_BASE_URL + queryString;
     return BaseApiHelper.postRequest(requestUrl, requestData);
   }
 }

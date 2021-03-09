@@ -4,7 +4,6 @@ import 'package:provider/provider.dart';
 import 'package:rent_a_tool_sample/data/request_notifier.dart';
 import 'package:rent_a_tool_sample/extras/shared_pref.dart';
 import 'package:rent_a_tool_sample/models/user_item.dart';
-import 'package:rent_a_tool_sample/screens/dashboard.dart';
 
 import '../extras/extensions.dart';
 import '../widgets/custom_text_field.dart';
@@ -26,26 +25,38 @@ class _RegistrationPageState extends State<RegistrationPage> {
   TextEditingController _email = TextEditingController();
   TextEditingController _password = TextEditingController();
   TextEditingController _confirmPassword = TextEditingController();
+  bool _loading = false;
+  final _formKey = GlobalKey<FormState>();
 
   void _onSingInClicked() {
     Navigator.pop(context);
   }
 
   void _onSingUpClicked() {
-    _auth
-        .register("${_firstName.text.toString()} ${_lastName.text.toString()}",
-            _email.text.toString(), _password.text.toString())
-        .then((response) {
-      if (response["status"] as bool) {
-        preferences.putBool(SharedPreference.IS_REGISTERED, true);
-        UserItem userItem = UserItem.fromJson(response["data"]);
-        Provider.of<UserProvider>(context, listen: false).setUserItem(userItem);
-        Navigator.push(
-            context, MaterialPageRoute(builder: (context) => Dashboard()));
-      } else {
-        print(response["message"]);
-      }
-    });
+    if (_formKey.currentState.validate()) {
+      setState(() {
+        _loading = true;
+      });
+      _auth
+          .register(
+              "${_firstName.text.toString().trim()} ${_lastName.text.toString().trim()}",
+              _email.text.toString().trim(),
+              _password.text.toString().trim())
+          .then((response) {
+        setState(() {
+          _loading = false;
+        });
+        if (response["status"] as bool) {
+          preferences.putBool(SharedPreference.IS_REGISTERED, true);
+          UserItem userItem = UserItem.fromJson(response["data"]);
+          Provider.of<UserProvider>(context, listen: false)
+              .setUserItem(userItem);
+          Navigator.pushReplacementNamed(context, Routes.dashboardRoute);
+        } else {
+          print(response["message"]);
+        }
+      });
+    }
   }
 
   @override
@@ -75,49 +86,104 @@ class _RegistrationPageState extends State<RegistrationPage> {
               alignment: Alignment.topCenter,
               margin: EdgeInsets.symmetric(
                   vertical: _mediaQuerySizeH * 0.04, horizontal: 20),
-              child: Column(children: [
-                "assets/images/logo.png".appLogo(
-                    w: _mediaQuerySizeW * 0.2, h: _mediaQuerySizeH * 0.15),
-                Text(
-                  "Sign up",
-                  style: Theme.of(context).textTheme.bodyText1,
-                ),
-                (_mediaQuerySizeH * 0.04).addHSpace(),
-                CustomTextField(
-                  controller: _firstName,
-                  text: "First Name",
-                  imageName: "assets/images/user.png",
-                ),
-                5.addHSpace(),
-                CustomTextField(
-                  controller: _lastName,
-                  text: "Last Name",
-                  imageName: "assets/images/user.png",
-                ),
-                5.addHSpace(),
-                CustomTextField(
-                  controller: _email,
-                  text: "Email Address",
-                  imageName: "assets/images/email.png",
-                  inputType: TextInputType.emailAddress,
-                ),
-                5.addHSpace(),
-                PasswordTextField(text: "Password"),
-                5.addHSpace(),
-                PasswordTextField(text: "Confirm Password"),
-                (_mediaQuerySizeH * 0.03).addHSpace(),
-                GradientRaisedButton("Sign up", _onSingUpClicked),
-                (_mediaQuerySizeH * 0.03).addHSpace(),
-                "- OR -".buttonText(isBold: false, color: Color(0xFF3E454F)),
-                (_mediaQuerySizeH * 0.02).addHSpace(),
-                SignUpButton(
-                    text: "Already have an Account ?",
-                    subText: " Sign in",
-                    onButtonClicked: _onSingInClicked)
-              ]),
+              child: Form(
+                autovalidateMode: AutovalidateMode.always,
+                key: _formKey,
+                child: Column(children: [
+                  "assets/images/logo.png".appLogo(
+                      w: _mediaQuerySizeW * 0.2, h: _mediaQuerySizeH * 0.15),
+                  Text(
+                    "Sign up",
+                    style: Theme.of(context).textTheme.bodyText1,
+                  ),
+                  (_mediaQuerySizeH * 0.04).addHSpace(),
+                  CustomTextField(
+                    controller: _firstName,
+                    text: "First Name",
+                    imageName: "assets/images/user.png",
+                    validator: (String value) {
+                      if (value.isEmpty) {
+                        return "Please enter first name";
+                      }
+                      return null;
+                    },
+                  ),
+                  5.addHSpace(),
+                  CustomTextField(
+                    controller: _lastName,
+                    text: "Last Name",
+                    imageName: "assets/images/user.png",
+                  ),
+                  5.addHSpace(),
+                  CustomTextField(
+                    controller: _email,
+                    text: "Email Address",
+                    imageName: "assets/images/email.png",
+                    inputType: TextInputType.emailAddress,
+                    validator: (String value) {
+                      if (value.isEmpty) {
+                        return "Please enter email.";
+                      } else {
+                        if (!value.isValidEmail()) {
+                          return "Please enter valid email.";
+                        }
+                      }
+                      return null;
+                    },
+                  ),
+                  5.addHSpace(),
+                  PasswordTextField(
+                    controller: _password,
+                    text: "Password",
+                    validator: (String value) {
+                      if (value.isEmpty) {
+                        return "Please enter password.";
+                      } else {
+                        if (value.length < 7) {
+                          return "Please enter at least 7 character password.";
+                        }
+                      }
+                      return null;
+                    },
+                  ),
+                  5.addHSpace(),
+                  PasswordTextField(
+                    controller: _confirmPassword,
+                    text: "Confirm Password",
+                    validator: (String value) {
+                      if (value.isEmpty) {
+                        return "Please enter confirm password.";
+                      } else {
+                        if (value != _password.text.toString().trim()) {
+                          return "Confirm password doesn't match.";
+                        }
+                      }
+                      return null;
+                    },
+                  ),
+                  (_mediaQuerySizeH * 0.03).addHSpace(),
+                  GradientRaisedButton("Sign up", _onSingUpClicked),
+                  (_mediaQuerySizeH * 0.03).addHSpace(),
+                  "- OR -".buttonText(isBold: false, color: Color(0xFF3E454F)),
+                  (_mediaQuerySizeH * 0.02).addHSpace(),
+                  SignUpButton(
+                      text: "Already have an Account ?",
+                      subText: " Sign in",
+                      onButtonClicked: _onSingInClicked)
+                ]),
+              ),
             ),
           ),
         ),
+        Visibility(
+          child: Container(
+            child: Center(
+              child: CircularProgressIndicator.adaptive(strokeWidth: 5),
+            ),
+            color: Colors.white24,
+          ),
+          visible: _loading,
+        )
       ]),
     );
   }

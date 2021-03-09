@@ -30,6 +30,7 @@ class SharedPreference {
   static const APP_DEVICE_MODEL = "App-Device-Model";
   static const APP_OS_VERSION = "App-Os-Version";
   static const APP_STORE_BUILD_NUMBER = "App-Store-Build-Number";
+  static const AUTH_TOKEN = "Auth-Token";
 
   saveUser(UserItem userItem) async {
     _preferences.setBool(IS_LOGGED_IN, true);
@@ -95,7 +96,11 @@ class SharedPreference {
   }
 
   String getString(String key, {String defValue = ""}) {
-    return _preferences == null ? defValue : _preferences.getString(key);
+    return _preferences == null
+        ? defValue
+        : _preferences.getString(key) == null
+            ? defValue
+            : _preferences.getString(key);
   }
 
   Future<bool> putInt(String key, int value) async {
@@ -103,7 +108,11 @@ class SharedPreference {
   }
 
   int getInt(String key, {int defValue = 0}) {
-    return _preferences == null ? defValue : _preferences.getInt(key);
+    return _preferences == null
+        ? defValue
+        : _preferences.getInt(key) == null
+            ? defValue
+            : _preferences.getInt(key);
   }
 
   Future<bool> putBool(String key, bool value) async {
@@ -111,6 +120,10 @@ class SharedPreference {
   }
 
   bool getBool(String key, {bool defValue = false}) {
-    return _preferences == null ? defValue : _preferences.getBool(key);
+    return _preferences == null
+        ? defValue
+        : _preferences.getBool(key) == null
+            ? defValue
+            : _preferences.getBool(key);
   }
 }

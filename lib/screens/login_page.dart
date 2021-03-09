@@ -11,7 +11,6 @@ import '../widgets/custom_text_field.dart';
 import '../widgets/gradient_raised_button.dart';
 import '../widgets/password_text_field.dart';
 import '../widgets/sign_up_button.dart';
-import 'dashboard.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -23,8 +22,8 @@ class _LoginPageState extends State<LoginPage> {
   double _mediaQuerySizeW;
   TextEditingController _emailController = TextEditingController();
   TextEditingController _passwordController = TextEditingController();
-  String _email;
-  String _password;
+  String _email = "";
+  String _password = "";
   RequestNotifier _auth;
   bool _loading = false;
   final _formKey = GlobalKey<FormState>();
@@ -78,21 +77,28 @@ class _LoginPageState extends State<LoginPage> {
       _isPasswordError = false;
       _loading = true;
     });*/
+    // await EasyLoading.show();
     if (_formKey.currentState.validate()) {
-      _auth.login(_email, _password).then((response) {
+      setState(() {
+        _loading = true;
+      });
+      _auth
+          .login(_emailController.text.toString().trim(),
+              _passwordController.text.toString().trim())
+          .then((response) {
         setState(() {
           _loading = false;
         });
+        // await EasyLoading.dismiss(animation: true);
         if (response["status"]) {
-          print(response["message"]);
-          preferences.putBool(SharedPreference.IS_LOGGED_IN, true);
           UserItem userItem = UserItem.fromJson(response["data"]);
+          preferences.putBool(SharedPreference.IS_LOGGED_IN, true);
+          preferences.putString(
+              SharedPreference.AUTH_TOKEN, userItem.authToken);
+          print(response["message"]);
           Provider.of<UserProvider>(context, listen: false)
               .setUserItem(userItem);
-          Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => Dashboard(), maintainState: false));
+          Navigator.pushReplacementNamed(context, Routes.dashboardRoute);
         } else {
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
             content: Text(response["message"]),
@@ -194,7 +200,7 @@ class _LoginPageState extends State<LoginPage> {
                         return null;
                       },
                       onSaved: (String value) {
-                        _email = value;
+                        _password = value;
                       },
                     ),
                     Visibility(
@@ -219,9 +225,15 @@ class _LoginPageState extends State<LoginPage> {
             ),
           ),
         ),
-        _loading
-            ? Center(child: CircularProgressIndicator.adaptive(strokeWidth: 5))
-            : Container()
+        Visibility(
+          child: Container(
+            child: Center(
+              child: CircularProgressIndicator.adaptive(strokeWidth: 5),
+            ),
+            color: Colors.white24,
+          ),
+          visible: _loading,
+        )
       ]),
     );
   }
