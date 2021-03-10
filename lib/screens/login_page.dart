@@ -95,6 +95,7 @@ class _LoginPageState extends State<LoginPage> {
           preferences.putBool(SharedPreference.IS_LOGGED_IN, true);
           preferences.putString(
               SharedPreference.AUTH_TOKEN, userItem.authToken);
+          preferences.saveUser(userItem);
           print(response["message"]);
           Provider.of<UserProvider>(context, listen: false)
               .setUserItem(userItem);
@@ -151,6 +152,7 @@ class _LoginPageState extends State<LoginPage> {
               margin: EdgeInsets.symmetric(
                   vertical: _mediaQuerySizeH * 0.01, horizontal: 20),
               child: Form(
+                autovalidateMode: AutovalidateMode.disabled,
                 key: _formKey,
                 child: Column(
                   children: [
@@ -209,8 +211,8 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                     (_mediaQuerySizeH * 0.04).addHSpace(),
                     GradientRaisedButton("Sign in", _onLoginClicked),
-                    CustomTextButton(
-                        "Forgot Password?", _onForgotPasswordClicked),
+                    // CustomTextButton(
+                    //     "Forgot Password?", _onForgotPasswordClicked),
                     (_mediaQuerySizeH * 0.12).addHSpace(),
                     "- OR -"
                         .buttonText(isBold: false, color: Color(0xFF3E454F)),

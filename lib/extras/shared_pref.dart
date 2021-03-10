@@ -43,7 +43,7 @@ class SharedPreference {
     _preferences.setString(_SOCIAL_ID, userItem.socialId);
   }
 
-  Future<UserItem> getUserItem() async {
+  UserItem getUserItem() {
     UserItem userItem = UserItem();
     userItem.userId = _preferences.getInt(_USER_ID);
     userItem.username = _preferences.getString(_USER_NAME);

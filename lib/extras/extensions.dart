@@ -53,6 +53,40 @@ extension text on String {
     );
   }
 
+  rowTitleText() {
+    return Text(
+      this,
+      style: GoogleFonts.openSans(
+        fontWeight: FontWeight.w600, // -> semiBold
+        color: Colors.black,
+        fontSize: 13,
+      ),
+    );
+  }
+
+  rowSubTitleText() {
+    return Text(
+      this,
+      style: GoogleFonts.openSans(
+        fontWeight: FontWeight.w600, // -> semiBold
+        color: Color(0xFF9E9E9E),
+        fontSize: 9,
+      ),
+    );
+  }
+
+  rowDetailText([int maxLines]) {
+    return Text(
+      this,
+      style: GoogleFonts.openSans(
+        color: Colors.black,
+        fontSize: 9,
+      ),
+      maxLines: maxLines,
+      overflow: TextOverflow.ellipsis,
+    );
+  }
+
   buttonText({bool isBold = true, Color color = Colors.white}) {
     return Text(
       this,
@@ -100,3 +134,7 @@ class Routes {
   static const String registrationRoute = "/registration";
   static const String dashboardRoute = "/dashboard";
 }
+
+var cardShadowColor = Colors.black38;
+var placeHolderImage = "assets/images/placeholder.png";
+var arrowImage = "assets/images/arrow.png";

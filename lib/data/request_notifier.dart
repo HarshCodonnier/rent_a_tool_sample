@@ -35,7 +35,7 @@ class RequestNotifier with ChangeNotifier {
     };
     String queryString = Uri(queryParameters: queryParameters).query;
     String requestUrl = AppUrls.BASE_URL + queryString;
-    return BaseApiHelper.postRequest(requestUrl, requestData,
+    return await BaseApiHelper.postRequest(requestUrl, requestData,
         passAuthToken: false);
   }
 
@@ -57,7 +57,7 @@ class RequestNotifier with ChangeNotifier {
     };
     String queryString = Uri(queryParameters: queryParameters).query;
     String requestUrl = AppUrls.BASE_URL + queryString;
-    return BaseApiHelper.postRequest(requestUrl, requestData,
+    return await BaseApiHelper.postRequest(requestUrl, requestData,
         passAuthToken: false);
   }
 
@@ -69,11 +69,9 @@ class RequestNotifier with ChangeNotifier {
       "search": search
     };
 
-    notifyListeners();
-
     var queryParameters = {RequestParam.service: MethodNames.agentList};
     String queryString = Uri(queryParameters: queryParameters).query;
     String requestUrl = AppUrls.CONTAINER_BASE_URL + queryString;
-    return BaseApiHelper.postRequest(requestUrl, requestData);
+    return await BaseApiHelper.postRequest(requestUrl, requestData);
   }
 }
