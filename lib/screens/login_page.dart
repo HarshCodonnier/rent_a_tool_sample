@@ -6,7 +6,6 @@ import '../extras/extensions.dart';
 import '../extras/shared_pref.dart';
 import '../models/user_item.dart';
 import '../screens/registration_page.dart';
-import '../widgets/custom_text_button.dart';
 import '../widgets/custom_text_field.dart';
 import '../widgets/gradient_raised_button.dart';
 import '../widgets/password_text_field.dart';
@@ -18,8 +17,6 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  double _mediaQuerySizeH;
-  double _mediaQuerySizeW;
   TextEditingController _emailController = TextEditingController();
   TextEditingController _passwordController = TextEditingController();
   String _email = "";
@@ -126,22 +123,20 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    _mediaQuerySizeH = MediaQuery.of(context).size.height;
-    _mediaQuerySizeW = MediaQuery.of(context).size.width;
     _auth = Provider.of<RequestNotifier>(context);
 
     return Scaffold(
       body: Stack(children: [
         Container(
-          height: MediaQuery.of(context).size.height,
+          height: mediaQueryH(context),
           color: Color(0xFFFEF8F6),
         ),
         Positioned(
-          width: _mediaQuerySizeW,
+          width: mediaQueryW(context),
           child: Image.asset(
             "assets/images/background.png",
             fit: BoxFit.fill,
-            height: _mediaQuerySizeH * 0.25,
+            height: mediaQueryH(context) * 0.25,
           ),
           bottom: 0,
         ),
@@ -150,20 +145,21 @@ class _LoginPageState extends State<LoginPage> {
             child: Container(
               alignment: Alignment.topCenter,
               margin: EdgeInsets.symmetric(
-                  vertical: _mediaQuerySizeH * 0.01, horizontal: 20),
+                  vertical: mediaQueryH(context) * 0.01, horizontal: 20),
               child: Form(
                 autovalidateMode: AutovalidateMode.disabled,
                 key: _formKey,
                 child: Column(
                   children: [
                     "assets/images/logo.png".appLogo(
-                        w: _mediaQuerySizeW * 0.2, h: _mediaQuerySizeH * 0.2),
-                    (_mediaQuerySizeH * 0.01).addHSpace(),
+                        w: mediaQueryW(context) * 0.2,
+                        h: mediaQueryH(context) * 0.2),
+                    (mediaQueryH(context) * 0.01).addHSpace(),
                     Text(
                       "Sign in",
                       style: Theme.of(context).textTheme.bodyText1,
                     ),
-                    (_mediaQuerySizeH * 0.06).addHSpace(),
+                    (mediaQueryH(context) * 0.06).addHSpace(),
                     CustomTextField(
                       controller: _emailController,
                       text: "Email Address",
@@ -209,14 +205,14 @@ class _LoginPageState extends State<LoginPage> {
                       child: _passwordErrorMessage.errorText(),
                       visible: _isPasswordError,
                     ),
-                    (_mediaQuerySizeH * 0.04).addHSpace(),
+                    (mediaQueryH(context) * 0.04).addHSpace(),
                     GradientRaisedButton("Sign in", _onLoginClicked),
                     // CustomTextButton(
                     //     "Forgot Password?", _onForgotPasswordClicked),
-                    (_mediaQuerySizeH * 0.12).addHSpace(),
+                    (mediaQueryH(context) * 0.12).addHSpace(),
                     "- OR -"
                         .buttonText(isBold: false, color: Color(0xFF3E454F)),
-                    (_mediaQuerySizeH * 0.02).addHSpace(),
+                    (mediaQueryH(context) * 0.02).addHSpace(),
                     SignUpButton(
                         text: "Don't have an Account ?",
                         subText: " Sign up",

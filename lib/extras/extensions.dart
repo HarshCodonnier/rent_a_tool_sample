@@ -129,12 +129,29 @@ extension text on String {
   }
 }
 
+Widget loaderWidget(BuildContext context, [bool isShow]) {
+  return Container(
+    height: mediaQueryH(context),
+    child: Center(
+      child: CircularProgressIndicator.adaptive(strokeWidth: 5),
+    ),
+    color: Colors.black38,
+  );
+}
+
+Widget errorWidget([String message = "Something wrong", String image]) {
+  return Center(child: Text(message));
+}
+
 class Routes {
   static const String defaultRoute = "/";
   static const String registrationRoute = "/registration";
   static const String dashboardRoute = "/dashboard";
 }
 
+double mediaQueryH(BuildContext context) => MediaQuery.of(context).size.height;
+
+double mediaQueryW(BuildContext context) => MediaQuery.of(context).size.width;
 var cardShadowColor = Colors.black38;
 var placeHolderImage = "assets/images/placeholder.png";
 var arrowImage = "assets/images/arrow.png";

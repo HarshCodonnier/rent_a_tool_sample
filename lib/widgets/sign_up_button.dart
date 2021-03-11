@@ -12,7 +12,7 @@ class SignUpButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: MediaQuery.of(context).size.width,
+      width: mediaQueryW(context),
       child: ElevatedButton(
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,

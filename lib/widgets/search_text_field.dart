@@ -3,13 +3,15 @@ import 'package:flutter/material.dart';
 class SearchTextField extends StatelessWidget {
   final TextEditingController search;
   final Function onSubmit;
+  final Function onChanged;
 
-  SearchTextField(this.search, this.onSubmit);
+  SearchTextField(this.search, this.onSubmit, this.onChanged);
 
   @override
   Widget build(BuildContext context) {
     return TextFormField(
-      onFieldSubmitted: (value) => onSubmit(value),
+      // onFieldSubmitted: (value) => onSubmit(value),
+      onChanged: (value) => onChanged(value),
       controller: search,
       decoration: InputDecoration(
         prefixIcon: Image.asset("assets/images/search.png"),

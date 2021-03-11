@@ -17,8 +17,6 @@ class RegistrationPage extends StatefulWidget {
 }
 
 class _RegistrationPageState extends State<RegistrationPage> {
-  double _mediaQuerySizeH;
-  double _mediaQuerySizeW;
   RequestNotifier _auth;
   TextEditingController _firstName = TextEditingController();
   TextEditingController _lastName = TextEditingController();
@@ -61,22 +59,20 @@ class _RegistrationPageState extends State<RegistrationPage> {
 
   @override
   Widget build(BuildContext context) {
-    _mediaQuerySizeH = MediaQuery.of(context).size.height;
-    _mediaQuerySizeW = MediaQuery.of(context).size.width;
     _auth = Provider.of<RequestNotifier>(context);
 
     return Scaffold(
       body: Stack(children: [
         Container(
-          height: MediaQuery.of(context).size.height,
+          height: mediaQueryH(context),
           color: Color(0xFFFEF8F6),
         ),
         Positioned(
-          width: _mediaQuerySizeW,
+          width: mediaQueryW(context),
           child: Image.asset(
             "assets/images/background.png",
             fit: BoxFit.fill,
-            height: _mediaQuerySizeH * 0.25,
+            height: mediaQueryH(context) * 0.25,
           ),
           bottom: 0,
         ),
@@ -85,18 +81,18 @@ class _RegistrationPageState extends State<RegistrationPage> {
             child: Container(
               alignment: Alignment.topCenter,
               margin: EdgeInsets.symmetric(
-                  vertical: _mediaQuerySizeH * 0.04, horizontal: 20),
+                  vertical: mediaQueryH(context) * 0.04, horizontal: 20),
               child: Form(
                 autovalidateMode: AutovalidateMode.always,
                 key: _formKey,
                 child: Column(children: [
                   "assets/images/logo.png".appLogo(
-                      w: _mediaQuerySizeW * 0.2, h: _mediaQuerySizeH * 0.15),
+                      w: mediaQueryW(context) * 0.2, h: mediaQueryH(context) * 0.15),
                   Text(
                     "Sign up",
                     style: Theme.of(context).textTheme.bodyText1,
                   ),
-                  (_mediaQuerySizeH * 0.04).addHSpace(),
+                  (mediaQueryH(context) * 0.04).addHSpace(),
                   CustomTextField(
                     controller: _firstName,
                     text: "First Name",
@@ -161,11 +157,11 @@ class _RegistrationPageState extends State<RegistrationPage> {
                       return null;
                     },
                   ),
-                  (_mediaQuerySizeH * 0.03).addHSpace(),
+                  (mediaQueryH(context) * 0.03).addHSpace(),
                   GradientRaisedButton("Sign up", _onSingUpClicked),
-                  (_mediaQuerySizeH * 0.03).addHSpace(),
+                  (mediaQueryH(context) * 0.03).addHSpace(),
                   "- OR -".buttonText(isBold: false, color: Color(0xFF3E454F)),
-                  (_mediaQuerySizeH * 0.02).addHSpace(),
+                  (mediaQueryH(context) * 0.02).addHSpace(),
                   SignUpButton(
                       text: "Already have an Account ?",
                       subText: " Sign in",

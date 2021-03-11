@@ -11,7 +11,7 @@ class GradientRaisedButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: MediaQuery.of(context).size.width,
+      width: mediaQueryW(context),
       height: 40.0,
       decoration: BoxDecoration(
         gradient: LinearGradient(
