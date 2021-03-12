@@ -2,14 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../data/request_notifier.dart';
-import '../extras/extensions.dart';
-import '../extras/shared_pref.dart';
+import '../extras/extras.dart';
 import '../models/user_item.dart';
-import '../screens/registration_page.dart';
-import '../widgets/custom_text_field.dart';
-import '../widgets/gradient_raised_button.dart';
-import '../widgets/password_text_field.dart';
-import '../widgets/sign_up_button.dart';
+import '../screens/screens.dart';
+import '../widgets/widgets.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -125,23 +121,24 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     _auth = Provider.of<RequestNotifier>(context);
 
-    return Scaffold(
-      body: Stack(children: [
-        Container(
-          height: mediaQueryH(context),
-          color: Color(0xFFFEF8F6),
+    return Stack(children: [
+      Container(
+        height: mediaQueryH(context),
+        color: Color(0xFFFEF8F6),
+      ),
+      Positioned(
+        width: mediaQueryW(context),
+        child: Image.asset(
+          "assets/images/background.png",
+          fit: BoxFit.fill,
+          height: mediaQueryH(context) * 0.25,
         ),
-        Positioned(
-          width: mediaQueryW(context),
-          child: Image.asset(
-            "assets/images/background.png",
-            fit: BoxFit.fill,
-            height: mediaQueryH(context) * 0.25,
-          ),
-          bottom: 0,
-        ),
-        SingleChildScrollView(
-          child: SafeArea(
+        bottom: 0,
+      ),
+      Scaffold(
+        backgroundColor: Colors.transparent,
+        body: SafeArea(
+          child: SingleChildScrollView(
             child: Container(
               alignment: Alignment.topCenter,
               margin: EdgeInsets.symmetric(
@@ -179,6 +176,7 @@ class _LoginPageState extends State<LoginPage> {
                         _email = value;
                       },
                     ),
+                    10.addHSpace(),
                     Visibility(
                       child: _emailErrorMessage.errorText(),
                       visible: _isEmailError,
@@ -223,16 +221,16 @@ class _LoginPageState extends State<LoginPage> {
             ),
           ),
         ),
-        Visibility(
-          child: Container(
-            child: Center(
-              child: CircularProgressIndicator.adaptive(strokeWidth: 5),
-            ),
-            color: Colors.white24,
+      ),
+      Visibility(
+        child: Container(
+          child: Center(
+            child: CircularProgressIndicator.adaptive(strokeWidth: 5),
           ),
-          visible: _loading,
-        )
-      ]),
-    );
+          color: Colors.white24,
+        ),
+        visible: _loading,
+      )
+    ]);
   }
 }

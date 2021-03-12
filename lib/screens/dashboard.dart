@@ -1,14 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:keyboard_visibility/keyboard_visibility.dart';
 import 'package:provider/provider.dart';
 
-import '../data/request_notifier.dart';
-import '../extras/extensions.dart';
-import '../extras/shared_pref.dart';
+import '../data/data.dart';
+import '../extras/extras.dart';
 import '../models/user_item.dart';
-import '../screens/login_page.dart';
-import '../widgets/agent_data.dart';
-import '../widgets/search_text_field.dart';
+import '../screens/screens.dart';
+import '../widgets/widgets.dart';
 
 class Dashboard extends StatefulWidget {
   @override
@@ -22,18 +19,6 @@ class _DashboardState extends State<Dashboard> {
   String _searchedText = "";
   Future<Map<String, dynamic>> _futureAgents;
   bool _showLoading = true;
-  bool _isKeyboardOpen = false;
-
-  @override
-  void initState() {
-    super.initState();
-    KeyboardVisibilityNotification().addNewListener(
-      onChange: (bool visible) {
-        print(visible);
-        _isKeyboardOpen = visible;
-      },
-    );
-  }
 
   void _onLogoutClicked(BuildContext context) {
     preferences.clearUserItem();
@@ -88,7 +73,7 @@ class _DashboardState extends State<Dashboard> {
           return errorWidget();
         }*/
         if (snapshot.connectionState == ConnectionState.waiting) {
-          if (_showLoading && _isKeyboardOpen) {
+          if (_showLoading) {
             _showLoading = false;
             return loaderWidget(context);
           }
@@ -114,7 +99,8 @@ class _DashboardState extends State<Dashboard> {
 
   @override
   Widget build(BuildContext context) {
-    UserItem userItem = Provider.of<UserProvider>(context).userItem;
+    // UserItem userItem = Provider.of<UserProvider>(context).userItem;
+    UserItem userItem = preferences.getUserItem();
     _auth = Provider.of<RequestNotifier>(context);
     _futureAgents = _auth.getAgentList(
         1, 50, _searchedText.length > 2 ? _searchedText : "");
@@ -122,13 +108,36 @@ class _DashboardState extends State<Dashboard> {
       appBar: AppBar(
         elevation: 0,
         automaticallyImplyLeading: false,
-        title: Text("Hello, ${preferences.getUserItem().username}"),
+        title: Text("Hello, ${userItem.username}"),
         backgroundColor: Color(0xFF5DDE5D),
         actions: [
           IconButton(
+            icon: ClipRRect(
+              borderRadius: BorderRadius.circular(5),
+              child:
+                  userItem.profileImage == null || userItem.profileImage.isEmpty
+                      ? Image.asset(
+                          placeHolderImage,
+                          height: appbarImageSize,
+                          width: appbarImageSize,
+                          fit: BoxFit.cover,
+                        )
+                      : FadeInImage.assetNetwork(
+                          placeholder: placeHolderImage,
+                          image:
+                              "${AppUrls.IMAGE_BASE_URL}${userItem.profileImage}",
+                          width: appbarImageSize,
+                          height: appbarImageSize,
+                          fit: BoxFit.cover,
+                        ),
+            ),
+            onPressed: () => Navigator.pushNamed(
+                context, Routes.editUserProfile,
+                arguments: userItem),
+          ),
+          IconButton(
             icon: Icon(Icons.power_settings_new),
             onPressed: () => _onLogoutClicked(context),
-            // onPressed: () => _onSearchChanged("jos"),
           )
         ],
       ),

@@ -87,6 +87,17 @@ extension text on String {
     );
   }
 
+  labelText() {
+    return Text(
+      this,
+      style: GoogleFonts.openSans(
+        fontWeight: FontWeight.w600, // -> semiBold
+        color: Colors.black,
+        fontSize: 14,
+      ),
+    );
+  }
+
   buttonText({bool isBold = true, Color color = Colors.white}) {
     return Text(
       this,
@@ -147,11 +158,30 @@ class Routes {
   static const String defaultRoute = "/";
   static const String registrationRoute = "/registration";
   static const String dashboardRoute = "/dashboard";
+  static const String editUserProfile = "/editUserProfile";
 }
 
 double mediaQueryH(BuildContext context) => MediaQuery.of(context).size.height;
 
 double mediaQueryW(BuildContext context) => MediaQuery.of(context).size.width;
+double appbarImageSize = 35;
+
 var cardShadowColor = Colors.black38;
+Color secondaryColor = Color(0xFF5DDE5D);
+Color hintTextColor = Color(0xFFA2A2A2);
+
 var placeHolderImage = "assets/images/placeholder.png";
 var arrowImage = "assets/images/arrow.png";
+var uploadImage = "assets/images/upload_profile.png";
+
+var textFieldStyle = GoogleFonts.openSans(
+  fontWeight: FontWeight.w600, // -> semiBold
+  color: Colors.black,
+  fontSize: 14,
+);
+
+var textFieldHintStyle = GoogleFonts.openSans(
+  fontWeight: FontWeight.w600, // -> semiBold
+  color: hintTextColor,
+  fontSize: 14,
+);

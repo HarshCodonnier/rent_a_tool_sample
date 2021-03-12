@@ -1,15 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:rent_a_tool_sample/data/request_notifier.dart';
-import 'package:rent_a_tool_sample/extras/shared_pref.dart';
-import 'package:rent_a_tool_sample/models/user_item.dart';
 
-import '../extras/extensions.dart';
-import '../widgets/custom_text_field.dart';
-import '../widgets/gradient_raised_button.dart';
-import '../widgets/password_text_field.dart';
-import '../widgets/sign_up_button.dart';
+import '../data/request_notifier.dart';
+import '../extras/extras.dart';
+import '../models/user_item.dart';
+import '../widgets/widgets.dart';
 
 class RegistrationPage extends StatefulWidget {
   @override
@@ -61,22 +57,23 @@ class _RegistrationPageState extends State<RegistrationPage> {
   Widget build(BuildContext context) {
     _auth = Provider.of<RequestNotifier>(context);
 
-    return Scaffold(
-      body: Stack(children: [
-        Container(
-          height: mediaQueryH(context),
-          color: Color(0xFFFEF8F6),
+    return Stack(children: [
+      Container(
+        height: mediaQueryH(context),
+        color: Color(0xFFFEF8F6),
+      ),
+      Positioned(
+        width: mediaQueryW(context),
+        child: Image.asset(
+          "assets/images/background.png",
+          fit: BoxFit.fill,
+          height: mediaQueryH(context) * 0.25,
         ),
-        Positioned(
-          width: mediaQueryW(context),
-          child: Image.asset(
-            "assets/images/background.png",
-            fit: BoxFit.fill,
-            height: mediaQueryH(context) * 0.25,
-          ),
-          bottom: 0,
-        ),
-        SingleChildScrollView(
+        bottom: 0,
+      ),
+      Scaffold(
+        backgroundColor: Colors.transparent,
+        body: SingleChildScrollView(
           child: SafeArea(
             child: Container(
               alignment: Alignment.topCenter,
@@ -87,7 +84,8 @@ class _RegistrationPageState extends State<RegistrationPage> {
                 key: _formKey,
                 child: Column(children: [
                   "assets/images/logo.png".appLogo(
-                      w: mediaQueryW(context) * 0.2, h: mediaQueryH(context) * 0.15),
+                      w: mediaQueryW(context) * 0.2,
+                      h: mediaQueryH(context) * 0.15),
                   Text(
                     "Sign up",
                     style: Theme.of(context).textTheme.bodyText1,
@@ -104,13 +102,13 @@ class _RegistrationPageState extends State<RegistrationPage> {
                       return null;
                     },
                   ),
-                  5.addHSpace(),
+                  10.addHSpace(),
                   CustomTextField(
                     controller: _lastName,
                     text: "Last Name",
                     imageName: "assets/images/user.png",
                   ),
-                  5.addHSpace(),
+                  10.addHSpace(),
                   CustomTextField(
                     controller: _email,
                     text: "Email Address",
@@ -127,7 +125,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                       return null;
                     },
                   ),
-                  5.addHSpace(),
+                  10.addHSpace(),
                   PasswordTextField(
                     controller: _password,
                     text: "Password",
@@ -142,7 +140,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                       return null;
                     },
                   ),
-                  5.addHSpace(),
+                  10.addHSpace(),
                   PasswordTextField(
                     controller: _confirmPassword,
                     text: "Confirm Password",
@@ -171,16 +169,16 @@ class _RegistrationPageState extends State<RegistrationPage> {
             ),
           ),
         ),
-        Visibility(
-          child: Container(
-            child: Center(
-              child: CircularProgressIndicator.adaptive(strokeWidth: 5),
-            ),
-            color: Colors.white24,
+      ),
+      Visibility(
+        child: Container(
+          child: Center(
+            child: CircularProgressIndicator.adaptive(strokeWidth: 5),
           ),
-          visible: _loading,
-        )
-      ]),
-    );
+          color: Colors.white24,
+        ),
+        visible: _loading,
+      )
+    ]);
   }
 }

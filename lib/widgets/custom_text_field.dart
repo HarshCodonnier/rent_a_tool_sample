@@ -27,25 +27,23 @@ class _CustomTextFieldState extends State<CustomTextField> {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(8),
         boxShadow: [BoxShadow(color: Color(0xFFF3DDD5), blurRadius: 10)],
       ),
-      child: Card(
-        shape: 8.cardRadius(),
-        child: TextFormField(
-          controller: widget.controller,
-          style: 16.textFieldText(),
-          cursorColor: Theme.of(context).textSelectionTheme.cursorColor,
-          decoration: InputDecoration(
-            border: InputBorder.none,
-            labelText: widget.text,
-            prefixIcon: widget.imageName.textFieldPrefixIcon(),
-          ),
-          keyboardType:
-              widget.inputType == null ? TextInputType.text : widget.inputType,
-          validator: widget.validator,
-          onSaved: widget.onSaved,
+      child: TextFormField(
+        controller: widget.controller,
+        style: 16.textFieldText(),
+        cursorColor: Theme.of(context).textSelectionTheme.cursorColor,
+        decoration: InputDecoration(
+          border: InputBorder.none,
+          labelText: widget.text,
+          prefixIcon: widget.imageName.textFieldPrefixIcon(),
         ),
-        shadowColor: Color(0xFFFCF1DE),
+        keyboardType:
+            widget.inputType == null ? TextInputType.text : widget.inputType,
+        validator: widget.validator,
+        onSaved: widget.onSaved,
       ),
     );
   }

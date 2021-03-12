@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:rent_a_tool_sample/screens/user_profile.dart';
 
 import 'data/request_notifier.dart';
 import 'extras/extensions.dart';
@@ -38,6 +39,7 @@ class MyApp extends StatelessWidget {
           Routes.defaultRoute: (context) => LoginPage(),
           Routes.registrationRoute: (context) => RegistrationPage(),
           Routes.dashboardRoute: (context) => Dashboard(),
+          Routes.editUserProfile: (context) => UserProfile(),
         },
         builder: EasyLoading.init(),
         title: 'Flutter Demo',
