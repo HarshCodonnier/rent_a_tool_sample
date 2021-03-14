@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:rent_a_tool_sample/widgets/widgets.dart';
 
-import '../data/data.dart';
 import '../extras/extras.dart';
 import '../models/user_item.dart';
 
@@ -20,6 +19,7 @@ class _UserProfileState extends State<UserProfile> {
   TextEditingController _emailController = TextEditingController();
   TextEditingController _addressController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
+  double _uploadImageSize = 60;
 
   @override
   Widget build(BuildContext context) {
@@ -29,17 +29,26 @@ class _UserProfileState extends State<UserProfile> {
     _emailController.text = userItem.email;
     _addressController.text = userItem.address;
 
+    _overLapPaddingWidget() {
+      return Container(
+        height: ((mediaQueryH(context) * UserProfile.userProfileSizeH) / 2) +
+            (_uploadImageSize / 2) -
+            4,
+        width: mediaQueryW(context) * UserProfile.userProfileSizeW,
+      );
+    }
+
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
-        title: Text("Edit Profile"),
+        title: const Text("Edit Profile"),
         backgroundColor: secondaryColor,
       ),
       body: SingleChildScrollView(
         child: SafeArea(
           child: Container(
             width: double.infinity,
-            margin: EdgeInsets.symmetric(horizontal: 20),
+            margin: const EdgeInsets.symmetric(horizontal: 20),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
@@ -48,8 +57,12 @@ class _UserProfileState extends State<UserProfile> {
                   clipBehavior: Clip.none,
                   children: [
                     Container(
-                      width: mediaQueryW(context) * UserProfile.userProfileSizeW,
-                      height: mediaQueryH(context) * UserProfile.userProfileSizeH,
+                      width:
+                          mediaQueryW(context) * UserProfile.userProfileSizeW,
+                      // 120,
+                      height:
+                          mediaQueryH(context) * UserProfile.userProfileSizeH,
+                      // 120,
                       decoration: BoxDecoration(
                         border: Border.all(
                           color: secondaryColor,
@@ -57,37 +70,30 @@ class _UserProfileState extends State<UserProfile> {
                         ),
                         borderRadius: BorderRadius.circular(14),
                       ),
-                    ),
-                    Container(
-                      width: mediaQueryW(context) * UserProfile.userProfileSizeW,
-                      height: mediaQueryH(context) * UserProfile.userProfileSizeH,
-                      padding: EdgeInsets.all(5),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(10),
-                        child: userItem.profileImage == null ||
-                                userItem.profileImage.isEmpty
-                            ? Image.asset(
-                                placeHolderImage,
-                                fit: BoxFit.cover,
-                              )
-                            : FadeInImage.assetNetwork(
-                                placeholder: placeHolderImage,
-                                image:
-                                    "${AppUrls.IMAGE_BASE_URL}${userItem.profileImage}",
-                                fit: BoxFit.cover,
-                              ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(4),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(10),
+                          child: ImageWidget(
+                            imageUrl: userItem.profileImage,
+                            placeHolderImage: placeHolderImage,
+                          ),
+                        ),
                       ),
                     ),
-                    Positioned(
-                      top: mediaQueryH(context) * 0.12,
-                      left: mediaQueryW(context) * 0.09,
-                      child: Container(
-                        child: Image.asset(uploadImage),
-                      ),
-                    ),
+                    Column(
+                      children: [
+                        _overLapPaddingWidget(),
+                        Image.asset(
+                          uploadImage,
+                          width: _uploadImageSize,
+                          height: _uploadImageSize,
+                        )
+                      ],
+                    )
                   ],
                 ),
-                60.addHSpace(),
+                20.addHSpace(),
                 Container(
                   width: double.infinity,
                   child: Form(
@@ -148,7 +154,7 @@ class _UserProfileState extends State<UserProfile> {
                   ),
                   child: TextButton(
                     onPressed: () {
-                      if(_formKey.currentState.validate()){
+                      if (_formKey.currentState.validate()) {
                         print("Update");
                       } else {
                         print("Update");

@@ -38,15 +38,16 @@ class _DashboardState extends State<Dashboard> {
   void _onSearchChanged(String value) {
     print(value);
 
-    _searchedText = value;
-    if (_searchedText.length > 2) {
+    if (_searchedText != value && value.length > 2) {
+      _searchedText = value;
       setState(() {
         _showLoading = true;
         _futureAgents = _auth.getAgentList(1, 50, _searchedText);
       });
       return;
     }
-    if (_searchedText.isEmpty) {
+    if (value.isEmpty) {
+      _searchedText = value;
       setState(() {
         _showLoading = true;
         _futureAgents = _auth.getAgentList(1, 50, _searchedText);
@@ -59,19 +60,6 @@ class _DashboardState extends State<Dashboard> {
     return FutureBuilder(
       future: _futureAgents,
       builder: (context, snapshot) {
-        /*if (snapshot.hasData) {
-          if (snapshot.data["status"]) {
-            print("working fine");
-            var items = snapshot.data["data"] as List<dynamic>;
-            return AgentData(items);
-          } else {
-            print("error in data");
-            return errorWidget(snapshot.data["message"]);
-          }
-        } else if (snapshot.hasError) {
-          print("error in request");
-          return errorWidget();
-        }*/
         if (snapshot.connectionState == ConnectionState.waiting) {
           if (_showLoading) {
             _showLoading = false;
@@ -92,7 +80,6 @@ class _DashboardState extends State<Dashboard> {
         } else {
           return loaderWidget(context);
         }
-        // return loaderWidget(context);
       },
     );
   }
@@ -114,22 +101,12 @@ class _DashboardState extends State<Dashboard> {
           IconButton(
             icon: ClipRRect(
               borderRadius: BorderRadius.circular(5),
-              child:
-                  userItem.profileImage == null || userItem.profileImage.isEmpty
-                      ? Image.asset(
-                          placeHolderImage,
-                          height: appbarImageSize,
-                          width: appbarImageSize,
-                          fit: BoxFit.cover,
-                        )
-                      : FadeInImage.assetNetwork(
-                          placeholder: placeHolderImage,
-                          image:
-                              "${AppUrls.IMAGE_BASE_URL}${userItem.profileImage}",
-                          width: appbarImageSize,
-                          height: appbarImageSize,
-                          fit: BoxFit.cover,
-                        ),
+              child: ImageWidget(
+                imageUrl: userItem.profileImage,
+                width: appbarImageSize,
+                height: appbarImageSize,
+                placeHolderImage: placeHolderImage,
+              ),
             ),
             onPressed: () => Navigator.pushNamed(
                 context, Routes.editUserProfile,

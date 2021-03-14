@@ -164,7 +164,11 @@ class Routes {
 double mediaQueryH(BuildContext context) => MediaQuery.of(context).size.height;
 
 double mediaQueryW(BuildContext context) => MediaQuery.of(context).size.width;
-double appbarImageSize = 35;
+
+double userProfileImageW(size) => ((size / 2) + 4) / 2;
+
+double userProfileImageH(size) => (((size / 2) + 4) + ((size / 2) + 4)) / 2;
+double appbarImageSize = 30;
 
 var cardShadowColor = Colors.black38;
 Color secondaryColor = Color(0xFF5DDE5D);

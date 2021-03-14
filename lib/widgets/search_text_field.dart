@@ -10,7 +10,6 @@ class SearchTextField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TextFormField(
-      // onFieldSubmitted: (value) => onSubmit(value),
       onChanged: (value) => onChanged(value),
       controller: search,
       decoration: InputDecoration(
