@@ -7,3 +7,4 @@ export '../widgets/image_widget.dart';
 export '../widgets/password_text_field.dart';
 export '../widgets/search_text_field.dart';
 export '../widgets/sign_up_button.dart';
+export '../widgets/container_raised_button.dart';

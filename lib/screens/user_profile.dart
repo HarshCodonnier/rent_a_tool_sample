@@ -1,6 +1,9 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:rent_a_tool_sample/widgets/widgets.dart';
 
 import '../extras/extras.dart';
@@ -20,6 +23,7 @@ class _UserProfileState extends State<UserProfile> {
   TextEditingController _addressController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   double _uploadImageSize = 60;
+  File _image;
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +37,7 @@ class _UserProfileState extends State<UserProfile> {
       return Container(
         height: ((mediaQueryH(context) * UserProfile.userProfileSizeH) / 2) +
             (_uploadImageSize / 2) -
-            4,
+            (Platform.isIOS ? -8 : 4),
         width: mediaQueryW(context) * UserProfile.userProfileSizeW,
       );
     }
@@ -59,10 +63,8 @@ class _UserProfileState extends State<UserProfile> {
                     Container(
                       width:
                           mediaQueryW(context) * UserProfile.userProfileSizeW,
-                      // 120,
                       height:
                           mediaQueryH(context) * UserProfile.userProfileSizeH,
-                      // 120,
                       decoration: BoxDecoration(
                         border: Border.all(
                           color: secondaryColor,
@@ -75,6 +77,7 @@ class _UserProfileState extends State<UserProfile> {
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(10),
                           child: ImageWidget(
+                            imageFile: _image,
                             imageUrl: userItem.profileImage,
                             placeHolderImage: placeHolderImage,
                           ),
@@ -84,11 +87,21 @@ class _UserProfileState extends State<UserProfile> {
                     Column(
                       children: [
                         _overLapPaddingWidget(),
-                        Image.asset(
-                          uploadImage,
-                          width: _uploadImageSize,
-                          height: _uploadImageSize,
-                        )
+                        Material(
+                          clipBehavior: Clip.antiAlias,
+                          borderRadius: BorderRadius.circular(50),
+                          color: Colors.transparent,
+                          child: InkResponse(
+                            child: Image.asset(
+                              uploadImage,
+                              width: _uploadImageSize,
+                              height: _uploadImageSize,
+                            ),
+                            onTap: () {
+                              _openImageChooser();
+                            },
+                          ),
+                        ),
                       ],
                     )
                   ],
@@ -146,31 +159,9 @@ class _UserProfileState extends State<UserProfile> {
                   ),
                 ),
                 50.addHSpace(),
-                Container(
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(8),
-                    color: secondaryColor,
-                  ),
-                  child: TextButton(
-                    onPressed: () {
-                      if (_formKey.currentState.validate()) {
-                        print("Update");
-                      } else {
-                        print("Update");
-                      }
-                    },
-                    child: Container(
-                      child: Text(
-                        "UPDATE PROFILE",
-                        style: GoogleFonts.openSans(
-                          fontWeight: FontWeight.w600,
-                          color: Colors.white,
-                          fontSize: 13,
-                        ),
-                      ),
-                    ),
-                  ),
+                ContainerRaisedButton(
+                  text: "UPDATE PROFILE",
+                  formKey: _formKey,
                 ),
                 15.addHSpace(),
               ],
@@ -179,5 +170,147 @@ class _UserProfileState extends State<UserProfile> {
         ),
       ),
     );
+  }
+
+  void _openImageChooser() {
+    Platform.isIOS
+        ? showModalBottomSheet(
+            context: context,
+            builder: (context) {
+              return SafeArea(
+                child: Container(
+                  child: Wrap(
+                    children: [
+                      ListTile(
+                        title: Text("Gallery"),
+                        leading: Icon(Icons.photo_library),
+                        onTap: () {
+                          _imageFormGallery();
+                          Navigator.pop(context);
+                        },
+                      ),
+                      ListTile(
+                        title: Text("Camera"),
+                        leading: Icon(Icons.photo_camera),
+                        onTap: () {
+                          _imageFromCamera();
+                          Navigator.pop(context);
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          )
+        : showDialog(
+            context: context,
+            builder: (context) {
+              return SimpleDialog(
+                title: Text("Select Image"),
+                children: [
+                  ListTile(
+                    title: Text("Photo Library"),
+                    leading: Icon(Icons.photo_library),
+                    onTap: () {
+                      _imageFormGallery();
+                      Navigator.pop(context);
+                    },
+                  ),
+                  ListTile(
+                    title: Text("Camera"),
+                    leading: Icon(Icons.photo_camera),
+                    onTap: () {
+                      _imageFromCamera();
+                      Navigator.pop(context);
+                    },
+                  ),
+                ],
+              );
+            },
+          );
+  }
+
+  void _imageFormGallery() async {
+    print("isGranted========> ${await Permission.storage.isGranted}");
+    print("isDenied========> ${await Permission.storage.isDenied}");
+    print(
+        "isPermanentlyDenied========> ${await Permission.storage.isPermanentlyDenied}");
+    print("isLimited========> ${await Permission.storage.isLimited}");
+    print("isRestricted========> ${await Permission.storage.isRestricted}");
+    print("isUndetermined========> ${await Permission.storage.isUndetermined}");
+    if (await Permission.storage.request().isGranted) {
+      final pickedFile = await ImagePicker()
+          .getImage(source: ImageSource.gallery, imageQuality: 100);
+      setState(() {
+        if (pickedFile != null) {
+          _image = File(pickedFile.path);
+          print(_image.path);
+        }
+      });
+      return;
+    } else if (await Permission.storage.isDenied) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+              "Without this permission app can not change profile picture."),
+        ),
+      );
+      return;
+    } else if (await Permission.storage.isPermanentlyDenied) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+              "To access this feature please grant permission from settings."),
+          action: SnackBarAction(
+            label: "Settings",
+            textColor: secondaryColor,
+            onPressed: openAppSettings,
+          ),
+        ),
+      );
+      return;
+    }
+  }
+
+  void _imageFromCamera() async {
+    if (await Permission.camera.request().isGranted) {
+      final pickedFile = await ImagePicker()
+          .getImage(source: ImageSource.camera, imageQuality: 100);
+      setState(() {
+        if (pickedFile != null) {
+          _image = File(pickedFile.path);
+          print(_image.path);
+        }
+      });
+    } else if (await Permission.camera.isDenied) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+              "Without this permission app can not change profile picture."),
+          action: Platform.isIOS
+              ? SnackBarAction(
+                  label: "Settings",
+                  textColor: secondaryColor,
+                  onPressed: openAppSettings,
+                )
+              : null,
+        ),
+      );
+      return;
+    } else if (await Permission.camera.isPermanentlyDenied) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+              "To access this feature please grant permission from settings."),
+          action: SnackBarAction(
+            label: "Settings",
+            textColor: secondaryColor,
+            onPressed: openAppSettings,
+          ),
+        ),
+      );
+      return;
+    }
   }
 }

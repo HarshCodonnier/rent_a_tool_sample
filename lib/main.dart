@@ -1,17 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import 'package:rent_a_tool_sample/screens/user_profile.dart';
 
-import 'data/request_notifier.dart';
-import 'extras/extensions.dart';
-import 'extras/shared_pref.dart';
+import 'data/data.dart';
+import 'extras/extras.dart';
 import 'models/user_item.dart';
-import 'screens/dashboard.dart';
-import 'screens/login_page.dart';
-import 'screens/registration_page.dart';
+import 'screens/screens.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -41,7 +36,6 @@ class MyApp extends StatelessWidget {
           Routes.dashboardRoute: (context) => Dashboard(),
           Routes.editUserProfile: (context) => UserProfile(),
         },
-        builder: EasyLoading.init(),
         title: 'Flutter Demo',
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
