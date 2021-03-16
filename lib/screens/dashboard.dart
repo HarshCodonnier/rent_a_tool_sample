@@ -106,6 +106,7 @@ class _DashboardState extends State<Dashboard> {
                 width: appbarImageSize,
                 height: appbarImageSize,
                 placeHolderImage: placeHolderImage,
+                isUserProfile: true,
               ),
             ),
             onPressed: () => Navigator.pushNamed(

@@ -30,8 +30,8 @@ class UserItem {
   String socialId;
   String profileImage;
   String address;
-  int latitude;
-  int longitude;
+  double latitude;
+  double longitude;
   String stripeId;
   String deviceType;
   String authToken;
@@ -42,7 +42,8 @@ class UserItem {
   factory UserItem.fromJson(Map<String, dynamic> json) => UserItem(
         userId: json["user_id"],
         userToken: json["user_token"],
-        username: json["username"],
+        username:
+            json["user_name"] != null ? json["user_name"] : json["username"],
         registrationCode: json["registration_code"],
         email: json["email"],
         verifyForgotCode: json["verify_forgot_code"],

@@ -20,11 +20,11 @@ class SharedPreference {
   static const String IS_REGISTERED = "isRegistered";
   static const String _USER_ID = "userId";
   static const String _USER_NAME = "userName";
-  static const String _PROFILE_IMAGE = "profileImage";
   static const String _EMAIL = "email";
   static const String _AUTH_TOKEN = "authToken";
   static const String _USER_TOKEN = "userToken";
   static const String _SOCIAL_ID = "socialId";
+  static const String PROFILE_IMAGE = "profileImage";
   static const APP_DEVICE_TYPE = "App-Device-Type";
   static const APP_STORE_VERSION = "App-Store-Version";
   static const APP_DEVICE_MODEL = "App-Device-Model";
@@ -36,7 +36,7 @@ class SharedPreference {
     _preferences.setBool(IS_LOGGED_IN, true);
     _preferences.setInt(_USER_ID, userItem.userId);
     _preferences.setString(_USER_NAME, userItem.username);
-    _preferences.setString(_PROFILE_IMAGE, userItem.profileImage);
+    _preferences.setString(PROFILE_IMAGE, userItem.profileImage);
     _preferences.setString(_EMAIL, userItem.email);
     _preferences.setString(_AUTH_TOKEN, userItem.authToken);
     _preferences.setString(_USER_TOKEN, userItem.userToken);
@@ -47,7 +47,7 @@ class SharedPreference {
     UserItem userItem = UserItem();
     userItem.userId = _preferences.getInt(_USER_ID);
     userItem.username = _preferences.getString(_USER_NAME);
-    userItem.profileImage = _preferences.getString(_PROFILE_IMAGE);
+    userItem.profileImage = _preferences.getString(PROFILE_IMAGE);
     userItem.email = _preferences.getString(_EMAIL);
     userItem.authToken = _preferences.getString(_AUTH_TOKEN);
     userItem.userToken = _preferences.getString(_USER_TOKEN);
@@ -60,7 +60,7 @@ class SharedPreference {
     _preferences.remove(IS_LOGGED_IN);
     _preferences.remove(_USER_ID);
     _preferences.remove(_USER_NAME);
-    _preferences.remove(_PROFILE_IMAGE);
+    _preferences.remove(PROFILE_IMAGE);
     _preferences.remove(_EMAIL);
     _preferences.remove(_AUTH_TOKEN);
     _preferences.remove(_USER_TOKEN);

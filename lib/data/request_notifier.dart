@@ -1,7 +1,12 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:http/http.dart';
+import 'package:http_parser/http_parser.dart';
+import 'package:mime/mime.dart';
 import 'package:rent_a_tool_sample/data/base_api_helper.dart';
+import 'package:rent_a_tool_sample/models/user_item.dart';
 
 import '../data/request_constants.dart';
 
@@ -73,5 +78,32 @@ class RequestNotifier with ChangeNotifier {
     String queryString = Uri(queryParameters: queryParameters).query;
     String requestUrl = AppUrls.CONTAINER_BASE_URL + queryString;
     return await BaseApiHelper.postRequest(requestUrl, requestData);
+  }
+
+  Future<Map<String, dynamic>> uploadImage(UserItem userItem, File file) async {
+    final Map<String, String> requestData = {
+      "username": userItem.username,
+      "email": userItem.email,
+      "address": userItem.address == null ? "" : userItem.address,
+      "latitude": userItem.latitude == null ? "" : "${userItem.latitude}",
+      "longitude": userItem.longitude == null ? "" : "${userItem.longitude}",
+    };
+    var mimeType = lookupMimeType(file.path).split("/");
+    final multipartFile = MultipartFile(
+      "profile_image",
+      file.readAsBytes().asStream(),
+      file.lengthSync(),
+      filename: file.path.split("/").last,
+      contentType: MediaType(mimeType[0], mimeType[1]),
+    );
+
+    var queryParameters = {
+      RequestParam.service: MethodNames.updateUserDetails,
+      RequestParam.showError: "true"
+    };
+    String queryString = Uri(queryParameters: queryParameters).query;
+    String requestUrl = AppUrls.CONTAINER_BASE_URL + queryString;
+    return await BaseApiHelper.uploadFile(
+        requestUrl, multipartFile, requestData);
   }
 }

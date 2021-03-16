@@ -10,13 +10,15 @@ class ImageWidget extends StatelessWidget {
   final double width;
   final double height;
   final String placeHolderImage;
+  final bool isUserProfile;
 
   ImageWidget(
       {@required this.imageUrl,
       this.imageFile,
       this.width,
       this.height,
-      this.placeHolderImage});
+      this.placeHolderImage,
+      this.isUserProfile});
 
   @override
   Widget build(BuildContext context) {
@@ -36,7 +38,8 @@ class ImageWidget extends StatelessWidget {
               )
             : FadeInImage.assetNetwork(
                 placeholder: placeHolderImage,
-                image: "${AppUrls.IMAGE_BASE_URL}$imageUrl",
+                image:
+                    "${isUserProfile != null && isUserProfile ? AppUrls.USER_IMAGE_BASE_URL : AppUrls.IMAGE_BASE_URL}$imageUrl",
                 height: height,
                 width: width,
                 fit: BoxFit.cover,
