@@ -31,6 +31,12 @@ extension textSize on int {
       height: this.toDouble(),
     );
   }
+
+  addWSpace() {
+    return SizedBox(
+      width: this.toDouble(),
+    );
+  }
 }
 
 extension text on String {

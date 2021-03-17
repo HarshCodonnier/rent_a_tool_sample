@@ -19,6 +19,7 @@ class _DashboardState extends State<Dashboard> {
   String _searchedText = "";
   Future<Map<String, dynamic>> _futureAgents;
   bool _showLoading = true;
+  String _profileImage = "";
 
   void _onLogoutClicked(BuildContext context) {
     preferences.clearUserItem();
@@ -85,6 +86,13 @@ class _DashboardState extends State<Dashboard> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    _profileImage = preferences.getString(SharedPreference.PROFILE_IMAGE);
+  }
+
+
+  @override
   Widget build(BuildContext context) {
     // UserItem userItem = Provider.of<UserProvider>(context).userItem;
     UserItem userItem = preferences.getUserItem();
@@ -102,7 +110,7 @@ class _DashboardState extends State<Dashboard> {
             icon: ClipRRect(
               borderRadius: BorderRadius.circular(5),
               child: ImageWidget(
-                imageUrl: userItem.profileImage,
+                imageUrl: _profileImage,
                 width: appbarImageSize,
                 height: appbarImageSize,
                 placeHolderImage: placeHolderImage,

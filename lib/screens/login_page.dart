@@ -1,4 +1,9 @@
+import 'dart:async';
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:http/http.dart';
 import 'package:provider/provider.dart';
 
 import '../data/request_notifier.dart';
@@ -24,6 +29,11 @@ class _LoginPageState extends State<LoginPage> {
   String _passwordErrorMessage = "";
   bool _isEmailError = false;
   bool _isPasswordError = false;
+  GoogleSignInAccount _currentUser;
+  GoogleSignIn _googleSignIn = GoogleSignIn(scopes: [
+    "email",
+    'https://www.googleapis.com/auth/contacts.readonly',
+  ]);
 
   void _onLoginClicked() async {
     /*if (_emailController.text.toString().isEmpty) {
@@ -77,7 +87,7 @@ class _LoginPageState extends State<LoginPage> {
       });
       _auth
           .login(_emailController.text.toString().trim(),
-              _passwordController.text.toString().trim())
+          _passwordController.text.toString().trim())
           .then((response) {
         setState(() {
           _loading = false;
@@ -103,9 +113,9 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   void _onForgotPasswordClicked() {
-    setState(() {
-      print("clicked");
-    });
+    // setState(() {
+    //   print("clicked");
+    // });
   }
 
   void _onSignUpClicked() {
@@ -117,8 +127,70 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
+  Future<void> _onGoogleSignIn() async {
+    try {
+      await _googleSignIn.signIn();
+    } catch (error) {
+      print(error);
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _googleSignIn.onCurrentUserChanged.listen((GoogleSignInAccount account) {
+      setState(() {
+        _currentUser = account;
+      });
+      if (_currentUser != null) {
+        _handleGetContact(_currentUser);
+      }
+    });
+    _googleSignIn.signInSilently();
+  }
+
+  Future<void> _handleGetContact(GoogleSignInAccount user) async {
+    setState(() {
+      _loading = true;
+    });
+    final Response response = await get(
+        "https://people.googleapis.com/v1/people/me/connections?requestMask.includeField=person.names",
+        headers: await user.authHeaders);
+
+    if (response.statusCode != 200) {
+      print("People API gave a ${response.statusCode} "
+          "response. Check logs for details.");
+      print("People API ${response.statusCode} response: ${response.body}");
+    }
+    final Map<String, dynamic> data = json.decode(response.body);
+    String namedContact = _pickFirstNamedContact(data);
+
+    setState(() {
+      _emailController.text = namedContact;
+    });
+  }
+
+  String _pickFirstNamedContact(Map<String, dynamic> data) {
+    final List<dynamic> connections = data["connections"];
+    final Map<String, dynamic> contact = connections.firstWhere(
+          (dynamic contact) => contact['names'] != null,
+      orElse: () => null,
+    );
+    if (contact != null) {
+      final Map<String, dynamic> name = contact['names'].firstWhere(
+            (dynamic name) => name['displayName'] != null,
+        orElse: () => null,
+      );
+      if (name != null) {
+        return name['displayName'];
+      }
+    }
+    return null;
+  }
+
   @override
   Widget build(BuildContext context) {
+    GoogleSignInAccount user = _currentUser;
     _auth = Provider.of<RequestNotifier>(context);
 
     return Stack(children: [
@@ -154,7 +226,10 @@ class _LoginPageState extends State<LoginPage> {
                     (mediaQueryH(context) * 0.01).addHSpace(),
                     Text(
                       "Sign in",
-                      style: Theme.of(context).textTheme.bodyText1,
+                      style: Theme
+                          .of(context)
+                          .textTheme
+                          .bodyText1,
                     ),
                     (mediaQueryH(context) * 0.06).addHSpace(),
                     CustomTextField(
@@ -205,11 +280,31 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                     (mediaQueryH(context) * 0.04).addHSpace(),
                     GradientRaisedButton("Sign in", _onLoginClicked),
-                    // CustomTextButton(
-                    //     "Forgot Password?", _onForgotPasswordClicked),
-                    (mediaQueryH(context) * 0.12).addHSpace(),
+                    CustomTextButton(
+                        "Forgot Password?", _onForgotPasswordClicked),
+                    (mediaQueryH(context) * 0.08).addHSpace(),
                     "- OR -"
                         .buttonText(isBold: false, color: Color(0xFF3E454F)),
+                    (mediaQueryH(context) * 0.02).addHSpace(),
+                    Row(
+                      children: [
+                        Container(
+                          width: (mediaQueryW(context) * 0.42),
+                          child: SignUpButton(
+                              text: "Google",
+                              subText: "",
+                              onButtonClicked: _onGoogleSignIn),
+                        ),
+                        15.addWSpace(),
+                        Container(
+                          width: (mediaQueryW(context) * 0.42),
+                          child: SignUpButton(
+                              text: "Facebook",
+                              subText: "",
+                              onButtonClicked: _onSignUpClicked),
+                        ),
+                      ],
+                    ),
                     (mediaQueryH(context) * 0.02).addHSpace(),
                     SignUpButton(
                         text: "Don't have an Account ?",

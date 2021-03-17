@@ -6,7 +6,7 @@ class AppUrls {
   static const String IMAGE_BASE_URL =
       "http://codonnier.tech/jaydeep/container/images/profile_images/";
   static const String USER_IMAGE_BASE_URL =
-      "http://codonnier.tech/jaydeep/container/images/user_images/";
+      "http://codonnier.tech/jaydeep/container/images/user_profile/";
 
   /// Create request with query parameter
   static const String BASE_URL = _LIVE_BASE_URL + "/Service.php?";

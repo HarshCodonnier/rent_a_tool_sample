@@ -22,27 +22,33 @@ class ImageWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return imageFile != null
-        ? Image.file(
-            imageFile,
-            height: height,
-            width: width,
-            fit: BoxFit.cover,
-          )
-        : imageUrl == null || imageUrl.isEmpty
-            ? Image.asset(
-                placeHolderImage,
-                height: height,
-                width: width,
-                fit: BoxFit.cover,
-              )
-            : FadeInImage.assetNetwork(
-                placeholder: placeHolderImage,
-                image:
-                    "${isUserProfile != null && isUserProfile ? AppUrls.USER_IMAGE_BASE_URL : AppUrls.IMAGE_BASE_URL}$imageUrl",
-                height: height,
-                width: width,
-                fit: BoxFit.cover,
-              );
+    if (imageFile != null) {
+      return Image.file(
+        imageFile,
+        height: height,
+        width: width,
+        fit: BoxFit.cover,
+      );
+    } else {
+      if (imageUrl == null || imageUrl.isEmpty) {
+        return Image.asset(
+          placeHolderImage,
+          height: height,
+          width: width,
+          fit: BoxFit.cover,
+        );
+      } else {
+        print(
+            "${isUserProfile != null && isUserProfile ? AppUrls.USER_IMAGE_BASE_URL : AppUrls.IMAGE_BASE_URL}$imageUrl");
+        return FadeInImage.assetNetwork(
+          placeholder: placeHolderImage,
+          image:
+              "${isUserProfile != null && isUserProfile ? AppUrls.USER_IMAGE_BASE_URL : AppUrls.IMAGE_BASE_URL}$imageUrl",
+          height: height,
+          width: width,
+          fit: BoxFit.cover,
+        );
+      }
+    }
   }
 }

@@ -29,6 +29,13 @@ class _UserProfileState extends State<UserProfile> {
   File _image;
   bool _imageUploading = false;
   RequestNotifier _auth;
+  String _profileImage = "";
+
+  @override
+  void initState() {
+    super.initState();
+    _profileImage = preferences.getString(SharedPreference.PROFILE_IMAGE);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -86,7 +93,7 @@ class _UserProfileState extends State<UserProfile> {
                               borderRadius: BorderRadius.circular(10),
                               child: ImageWidget(
                                 imageFile: _image,
-                                imageUrl: _userItem.profileImage,
+                                imageUrl: _profileImage,
                                 placeHolderImage: placeHolderImage,
                                 isUserProfile: true,
                               ),
@@ -323,16 +330,14 @@ class _UserProfileState extends State<UserProfile> {
       _imageUploading = true;
     });
     _auth.uploadImage(_userItem, File(pickedFile.path)).then((response) {
-      if (response["status"]) {
-        _image = File(pickedFile.path);
-        _userItem = UserItem.fromJson(response["data"]);
-        preferences.putString(
-            SharedPreference.PROFILE_IMAGE, _userItem.profileImage);
-      } else {
-        _image = null;
-      }
+      _image = null;
       setState(() {
         _imageUploading = false;
+        if (response["status"]) {
+          _userItem = UserItem.fromJson(response["data"]);
+          preferences.saveUser(_userItem);
+          _profileImage = _userItem.profileImage;
+        }
       });
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text(response["message"]),
