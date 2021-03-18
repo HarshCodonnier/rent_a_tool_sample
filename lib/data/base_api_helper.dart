@@ -13,7 +13,7 @@ class BaseApiHelper {
       String requestUrl, Map<String, dynamic> requestData,
       {bool passAuthToken = true}) async {
     print("request:" + requestUrl);
-    return await post(requestUrl, body: json.encode(requestData), headers: {
+    return await post(Uri.parse(requestUrl), body: json.encode(requestData), headers: {
       RequestHeaderKey.contentType: "application/json",
       RequestHeaderKey.userAgent: "container1102",
       RequestHeaderKey.appSecret: "container1102",

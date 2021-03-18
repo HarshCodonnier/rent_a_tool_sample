@@ -45,9 +45,12 @@ class _RegistrationPageState extends State<RegistrationPage> {
           UserItem userItem = UserItem.fromJson(response["data"]);
           Provider.of<UserProvider>(context, listen: false)
               .setUserItem(userItem);
+          print("Logged in with: ${userItem.username}");
           Navigator.pushReplacementNamed(context, Routes.dashboardRoute);
         } else {
           print(response["message"]);
+          ScaffoldMessenger.of(context)
+              .showSnackBar(SnackBar(content: Text(response["message"])));
         }
       });
     }

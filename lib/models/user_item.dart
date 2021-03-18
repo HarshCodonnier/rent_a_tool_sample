@@ -50,8 +50,12 @@ class UserItem {
         socialId: json["social_id"],
         profileImage: json["profile_image"],
         address: json["address"],
-        latitude: json["latitude"],
-        longitude: json["longitude"],
+        latitude: json["latitude"] is int
+            ? double.parse(json["latitude"].toString())
+            : json["latitude"],
+        longitude: json["longitude"] is int
+            ? double.parse(json["longitude"].toString())
+            : json["longitude"],
         stripeId: json["stripe_id"],
         deviceType: json["device_type"],
         authToken: json["auth_token"],

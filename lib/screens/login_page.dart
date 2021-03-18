@@ -1,9 +1,10 @@
 import 'dart:async';
-import 'dart:convert';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_facebook_login/flutter_facebook_login.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:http/http.dart';
 import 'package:provider/provider.dart';
 
 import '../data/request_notifier.dart';
@@ -20,8 +21,6 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   TextEditingController _emailController = TextEditingController();
   TextEditingController _passwordController = TextEditingController();
-  String _email = "";
-  String _password = "";
   RequestNotifier _auth;
   bool _loading = false;
   final _formKey = GlobalKey<FormState>();
@@ -30,6 +29,7 @@ class _LoginPageState extends State<LoginPage> {
   bool _isEmailError = false;
   bool _isPasswordError = false;
   GoogleSignInAccount _currentUser;
+  final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
   GoogleSignIn _googleSignIn = GoogleSignIn(scopes: [
     "email",
     'https://www.googleapis.com/auth/contacts.readonly',
@@ -87,7 +87,7 @@ class _LoginPageState extends State<LoginPage> {
       });
       _auth
           .login(_emailController.text.toString().trim(),
-          _passwordController.text.toString().trim())
+              _passwordController.text.toString().trim())
           .then((response) {
         setState(() {
           _loading = false;
@@ -102,6 +102,7 @@ class _LoginPageState extends State<LoginPage> {
           print(response["message"]);
           Provider.of<UserProvider>(context, listen: false)
               .setUserItem(userItem);
+          print("Logged in with: ${userItem.username}");
           Navigator.pushReplacementNamed(context, Routes.dashboardRoute);
         } else {
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -113,9 +114,7 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   void _onForgotPasswordClicked() {
-    // setState(() {
-    //   print("clicked");
-    // });
+    print("clicked");
   }
 
   void _onSignUpClicked() {
@@ -129,63 +128,77 @@ class _LoginPageState extends State<LoginPage> {
 
   Future<void> _onGoogleSignIn() async {
     try {
-      await _googleSignIn.signIn();
+      setState(() {
+        _loading = true;
+      });
+      final GoogleSignInAccount googleSignInAccount =
+          await _googleSignIn.signIn();
+      final GoogleSignInAuthentication googleSignInAuthentication =
+          await googleSignInAccount.authentication;
+
+      final AuthCredential authCredential = GoogleAuthProvider.credential(
+          accessToken: googleSignInAuthentication.accessToken,
+          idToken: googleSignInAuthentication.idToken);
+      final UserCredential userCredential =
+          await _firebaseAuth.signInWithCredential(authCredential);
+      final User user = userCredential.user;
+
+      assert(!user.isAnonymous);
+      assert(await user.getIdToken() != null);
+
+      final User currentUser = _firebaseAuth.currentUser;
+      assert(user.uid == currentUser.uid);
+
+      print("Logged in with: ${user.displayName}");
+      _auth.register(user.displayName, user.email, "1234567");
+      _auth.register(user.displayName, user.email, "1234567").then((response) {
+        setState(() {
+          _loading = false;
+        });
+        if (response["status"] as bool) {
+          preferences.putBool(SharedPreference.IS_REGISTERED, true);
+          UserItem userItem = UserItem.fromJson(response["data"]);
+          Provider.of<UserProvider>(context, listen: false)
+              .setUserItem(userItem);
+          Navigator.pushReplacementNamed(context, Routes.dashboardRoute);
+          return;
+        } else {
+          print(response["message"]);
+          ScaffoldMessenger.of(context)
+              .showSnackBar(SnackBar(content: Text(response["message"])));
+        }
+      });
     } catch (error) {
+      setState(() {
+        _loading = false;
+      });
       print(error);
+    }
+  }
+
+  void _initiateFacebookLogin() async {
+    var facebookLogin = FacebookLogin();
+    FacebookLoginResult facebookLoginResult =
+        await facebookLogin.logIn(["email"]);
+    switch (facebookLoginResult.status) {
+      case FacebookLoginStatus.error:
+        print("Error");
+        // onLoginStatusChanged(false);
+        break;
+      case FacebookLoginStatus.cancelledByUser:
+        print("CancelledByUser");
+        // onLoginStatusChanged(false);
+        break;
+      case FacebookLoginStatus.loggedIn:
+        print("LoggedIn");
+        // onLoginStatusChanged(true);
+        break;
     }
   }
 
   @override
   void initState() {
     super.initState();
-    _googleSignIn.onCurrentUserChanged.listen((GoogleSignInAccount account) {
-      setState(() {
-        _currentUser = account;
-      });
-      if (_currentUser != null) {
-        _handleGetContact(_currentUser);
-      }
-    });
-    _googleSignIn.signInSilently();
-  }
-
-  Future<void> _handleGetContact(GoogleSignInAccount user) async {
-    setState(() {
-      _loading = true;
-    });
-    final Response response = await get(
-        "https://people.googleapis.com/v1/people/me/connections?requestMask.includeField=person.names",
-        headers: await user.authHeaders);
-
-    if (response.statusCode != 200) {
-      print("People API gave a ${response.statusCode} "
-          "response. Check logs for details.");
-      print("People API ${response.statusCode} response: ${response.body}");
-    }
-    final Map<String, dynamic> data = json.decode(response.body);
-    String namedContact = _pickFirstNamedContact(data);
-
-    setState(() {
-      _emailController.text = namedContact;
-    });
-  }
-
-  String _pickFirstNamedContact(Map<String, dynamic> data) {
-    final List<dynamic> connections = data["connections"];
-    final Map<String, dynamic> contact = connections.firstWhere(
-          (dynamic contact) => contact['names'] != null,
-      orElse: () => null,
-    );
-    if (contact != null) {
-      final Map<String, dynamic> name = contact['names'].firstWhere(
-            (dynamic name) => name['displayName'] != null,
-        orElse: () => null,
-      );
-      if (name != null) {
-        return name['displayName'];
-      }
-    }
-    return null;
   }
 
   @override
@@ -226,10 +239,7 @@ class _LoginPageState extends State<LoginPage> {
                     (mediaQueryH(context) * 0.01).addHSpace(),
                     Text(
                       "Sign in",
-                      style: Theme
-                          .of(context)
-                          .textTheme
-                          .bodyText1,
+                      style: Theme.of(context).textTheme.bodyText1,
                     ),
                     (mediaQueryH(context) * 0.06).addHSpace(),
                     CustomTextField(
@@ -246,9 +256,6 @@ class _LoginPageState extends State<LoginPage> {
                           }
                         }
                         return null;
-                      },
-                      onSaved: (String value) {
-                        _email = value;
                       },
                     ),
                     10.addHSpace(),
@@ -270,9 +277,6 @@ class _LoginPageState extends State<LoginPage> {
                         }
                         return null;
                       },
-                      onSaved: (String value) {
-                        _password = value;
-                      },
                     ),
                     Visibility(
                       child: _passwordErrorMessage.errorText(),
@@ -287,21 +291,18 @@ class _LoginPageState extends State<LoginPage> {
                         .buttonText(isBold: false, color: Color(0xFF3E454F)),
                     (mediaQueryH(context) * 0.02).addHSpace(),
                     Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Container(
-                          width: (mediaQueryW(context) * 0.42),
-                          child: SignUpButton(
-                              text: "Google",
-                              subText: "",
-                              onButtonClicked: _onGoogleSignIn),
+                        SocialSignInButton(
+                          icon: FontAwesomeIcons.google,
+                          color: Color(0xFFDB4437),
+                          onClick: _onGoogleSignIn,
                         ),
                         15.addWSpace(),
-                        Container(
-                          width: (mediaQueryW(context) * 0.42),
-                          child: SignUpButton(
-                              text: "Facebook",
-                              subText: "",
-                              onButtonClicked: _onSignUpClicked),
+                        SocialSignInButton(
+                          icon: FontAwesomeIcons.facebookF,
+                          color: Color(0xFF4267B2),
+                          onClick: _initiateFacebookLogin,
                         ),
                       ],
                     ),

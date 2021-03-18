@@ -1,0 +1,135 @@
+{
+  "project_info": {
+    "project_number": "714415757144",
+    "firebase_url": "https://test-a7d50.firebaseio.com",
+    "project_id": "test-a7d50",
+    "storage_bucket": "test-a7d50.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:714415757144:android:7753770884f6cbe9abf72d",
+        "android_client_info": {
+          "package_name": "com.codonnier.rent_a_tool_sample"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "714415757144-p80nffbr8552r8drf4h36bd7ru6voj5i.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.codonnier.rent_a_tool_sample",
+            "certificate_hash": "550986356e050e76ae0853ca1d5098b248f26d56"
+          }
+        },
+        {
+          "client_id": "714415757144-gf640gl1qcmoondi6l4fj3h1mquletm7.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBuhQEG3uXCj29XSWJzoaz-hqTWBSY2ImY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "714415757144-gf640gl1qcmoondi6l4fj3h1mquletm7.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:714415757144:android:5e6bce55dc779393abf72d",
+        "android_client_info": {
+          "package_name": "com.example.flutter_demo"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "714415757144-gf640gl1qcmoondi6l4fj3h1mquletm7.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBuhQEG3uXCj29XSWJzoaz-hqTWBSY2ImY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "714415757144-gf640gl1qcmoondi6l4fj3h1mquletm7.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:714415757144:android:2bacc63e29e7d63babf72d",
+        "android_client_info": {
+          "package_name": "com.example.get_push_notification"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "714415757144-gf640gl1qcmoondi6l4fj3h1mquletm7.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBuhQEG3uXCj29XSWJzoaz-hqTWBSY2ImY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "714415757144-gf640gl1qcmoondi6l4fj3h1mquletm7.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:714415757144:android:7f5cb34fbd5bf1a5abf72d",
+        "android_client_info": {
+          "package_name": "com.harsh.housingsocienty"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "714415757144-gf640gl1qcmoondi6l4fj3h1mquletm7.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBuhQEG3uXCj29XSWJzoaz-hqTWBSY2ImY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "714415757144-gf640gl1qcmoondi6l4fj3h1mquletm7.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
