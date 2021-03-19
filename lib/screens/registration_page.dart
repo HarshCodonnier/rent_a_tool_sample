@@ -45,6 +45,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
           UserItem userItem = UserItem.fromJson(response["data"]);
           Provider.of<UserProvider>(context, listen: false)
               .setUserItem(userItem);
+          preferences.saveUser(userItem);
           print("Logged in with: ${userItem.username}");
           Navigator.pushReplacementNamed(context, Routes.dashboardRoute);
         } else {

@@ -45,13 +45,14 @@ class RequestNotifier with ChangeNotifier {
   }
 
   Future<Map<String, dynamic>> register(
-      String userName, String email, String password) async {
+      String userName, String email, String password,
+      [String socialId]) async {
     final Map<String, dynamic> requestData = {
       "username": userName,
       "email": email,
       "password": password,
       "registration_code": "bscode1123138",
-      "social_id": ""
+      "social_id": socialId == null ? "" : socialId
     };
 
     _registeredInStatus = Status.Registering;

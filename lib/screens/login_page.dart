@@ -1,17 +1,19 @@
-import 'dart:async';
-
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_facebook_login/flutter_facebook_login.dart';
+import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:provider/provider.dart';
+import 'package:rent_a_tool_sample/models/fb_user_data.dart';
 
 import '../data/request_notifier.dart';
 import '../extras/extras.dart';
 import '../models/user_item.dart';
 import '../screens/screens.dart';
 import '../widgets/widgets.dart';
+
+GoogleSignIn googleSignIn = GoogleSignIn(
+  scopes: ['email'],
+);
 
 class LoginPage extends StatefulWidget {
   @override
@@ -29,11 +31,6 @@ class _LoginPageState extends State<LoginPage> {
   bool _isEmailError = false;
   bool _isPasswordError = false;
   GoogleSignInAccount _currentUser;
-  final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
-  GoogleSignIn _googleSignIn = GoogleSignIn(scopes: [
-    "email",
-    'https://www.googleapis.com/auth/contacts.readonly',
-  ]);
 
   void _onLoginClicked() async {
     /*if (_emailController.text.toString().isEmpty) {
@@ -95,7 +92,6 @@ class _LoginPageState extends State<LoginPage> {
         // await EasyLoading.dismiss(animation: true);
         if (response["status"]) {
           UserItem userItem = UserItem.fromJson(response["data"]);
-          preferences.putBool(SharedPreference.IS_LOGGED_IN, true);
           preferences.putString(
               SharedPreference.AUTH_TOKEN, userItem.authToken);
           preferences.saveUser(userItem);
@@ -126,32 +122,22 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  Future<void> _onGoogleSignIn() async {
+  _googleSignIn(GoogleSignInAccount googleSignInAccount) async {
     try {
+      assert(googleSignInAccount != null);
+      final GoogleSignInAuthentication googleSignInAuthentication =
+          await googleSignInAccount.authentication;
+      assert(googleSignInAuthentication != null);
+
       setState(() {
         _loading = true;
       });
-      final GoogleSignInAccount googleSignInAccount =
-          await _googleSignIn.signIn();
-      final GoogleSignInAuthentication googleSignInAuthentication =
-          await googleSignInAccount.authentication;
-
-      final AuthCredential authCredential = GoogleAuthProvider.credential(
-          accessToken: googleSignInAuthentication.accessToken,
-          idToken: googleSignInAuthentication.idToken);
-      final UserCredential userCredential =
-          await _firebaseAuth.signInWithCredential(authCredential);
-      final User user = userCredential.user;
-
-      assert(!user.isAnonymous);
-      assert(await user.getIdToken() != null);
-
-      final User currentUser = _firebaseAuth.currentUser;
-      assert(user.uid == currentUser.uid);
-
-      print("Logged in with: ${user.displayName}");
-      _auth.register(user.displayName, user.email, "1234567");
-      _auth.register(user.displayName, user.email, "1234567").then((response) {
+      print("Logged in with Google: ${googleSignInAccount.displayName}");
+      print("googleId: ${googleSignInAccount.id}");
+      _auth
+          .register(googleSignInAccount.displayName, googleSignInAccount.email,
+              "1234567", googleSignInAccount.id)
+          .then((response) {
         setState(() {
           _loading = false;
         });
@@ -160,6 +146,7 @@ class _LoginPageState extends State<LoginPage> {
           UserItem userItem = UserItem.fromJson(response["data"]);
           Provider.of<UserProvider>(context, listen: false)
               .setUserItem(userItem);
+          preferences.saveUser(userItem);
           Navigator.pushReplacementNamed(context, Routes.dashboardRoute);
           return;
         } else {
@@ -176,29 +163,79 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
-  void _initiateFacebookLogin() async {
-    var facebookLogin = FacebookLogin();
-    FacebookLoginResult facebookLoginResult =
-        await facebookLogin.logIn(["email"]);
-    switch (facebookLoginResult.status) {
-      case FacebookLoginStatus.error:
-        print("Error");
-        // onLoginStatusChanged(false);
-        break;
-      case FacebookLoginStatus.cancelledByUser:
-        print("CancelledByUser");
-        // onLoginStatusChanged(false);
-        break;
-      case FacebookLoginStatus.loggedIn:
-        print("LoggedIn");
-        // onLoginStatusChanged(true);
-        break;
+  void _facebookSignIn() async {
+    try {
+      final fbAccessToken = await FacebookAuth.instance.login();
+      assert(fbAccessToken != null);
+      final userData = await FacebookAuth.instance.getUserData();
+      assert(userData != null);
+      setState(() {
+        _loading = true;
+      });
+      print(userData);
+      FacebookUserData facebookUserData = FacebookUserData.fromJson(userData);
+      print("Logged in with Facebook: ${facebookUserData.name}");
+      print("fbId: ${facebookUserData.id}");
+      _auth
+          .register(facebookUserData.name, facebookUserData.email, "1234567",
+              facebookUserData.id.toString())
+          .then((response) {
+        setState(() {
+          _loading = false;
+        });
+        if (response["status"] as bool) {
+          preferences.putBool(SharedPreference.IS_REGISTERED, true);
+          UserItem userItem = UserItem.fromJson(response["data"]);
+          Provider.of<UserProvider>(context, listen: false)
+              .setUserItem(userItem);
+          preferences.saveUser(userItem);
+          Navigator.pushReplacementNamed(context, Routes.dashboardRoute);
+          return;
+        } else {
+          print(response["message"]);
+          ScaffoldMessenger.of(context)
+              .showSnackBar(SnackBar(content: Text(response["message"])));
+        }
+      });
+    } on FacebookAuthException catch (e) {
+      print(e.message);
+      switch (e.errorCode) {
+        case FacebookAuthErrorCode.OPERATION_IN_PROGRESS:
+          print("You have a previous login operation in progress");
+          break;
+        case FacebookAuthErrorCode.CANCELLED:
+          print("login CANCELLED");
+          break;
+        case FacebookAuthErrorCode.FAILED:
+          print("login FAILED");
+          break;
+      }
+    } catch (error) {
+      setState(() {
+        _loading = false;
+      });
+      print(error);
     }
   }
 
   @override
   void initState() {
     super.initState();
+
+    googleSignIn.onCurrentUserChanged.listen((googleSignInAccount) {
+      _googleSignIn(googleSignInAccount);
+    }, onError: (error) {
+      print("Google signIn error onCurrentUserChanged: $error");
+    });
+
+    if (preferences.getBool(SharedPreference.IS_LOGGED_IN)) {
+      googleSignIn
+          .signInSilently(suppressErrors: false)
+          .then((googleSignInAccount) => _googleSignIn(googleSignInAccount))
+          .catchError((error) {
+        print("Google signIn error signInSilently: $error");
+      });
+    }
   }
 
   @override
@@ -296,13 +333,13 @@ class _LoginPageState extends State<LoginPage> {
                         SocialSignInButton(
                           icon: FontAwesomeIcons.google,
                           color: Color(0xFFDB4437),
-                          onClick: _onGoogleSignIn,
+                          onClick: () => googleSignIn.signIn(),
                         ),
                         15.addWSpace(),
                         SocialSignInButton(
                           icon: FontAwesomeIcons.facebookF,
                           color: Color(0xFF4267B2),
-                          onClick: _initiateFacebookLogin,
+                          onClick: _facebookSignIn,
                         ),
                       ],
                     ),
