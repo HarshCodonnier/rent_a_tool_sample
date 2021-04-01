@@ -20,6 +20,19 @@ class _DashboardState extends State<Dashboard> {
   Future<Map<String, dynamic>> _futureAgents;
   bool _showLoading = true;
   String _profileImage = "";
+  static const LIST_TO_GRID = "List to Grid";
+  static const GRID_TO_LIST = "Grid to List";
+  static const HORIZONTAL = "Horizontal";
+  static const VERTICAL = "Vertical";
+
+  static Map<int, String> _choicesMap = {
+    0: LIST_TO_GRID,
+    1: HORIZONTAL,
+    2: "Logout"
+  };
+
+  bool _isList = true;
+  bool _isVertical = true;
 
   void _onLogoutClicked(BuildContext context) {
     preferences.clearUserItem();
@@ -71,7 +84,7 @@ class _DashboardState extends State<Dashboard> {
           _showLoading = false;
           if (snapshot.data["status"]) {
             var items = snapshot.data["data"] as List<dynamic>;
-            return AgentData(items);
+            return AgentData(items, _isList, _isVertical);
           } else {
             return errorWidget(snapshot.data["message"]);
           }
@@ -85,12 +98,45 @@ class _DashboardState extends State<Dashboard> {
     );
   }
 
+  void _onMenuItemSelected(int choice) {
+    setState(() {
+      switch (choice) {
+        case 0:
+          _choicesMap[choice] = _isList ? GRID_TO_LIST : LIST_TO_GRID;
+          _isList = !_isList;
+          if(!_isList)
+            _isVertical = true;
+          break;
+        case 1:
+          _choicesMap[choice] = _isVertical ? VERTICAL : HORIZONTAL;
+          _isVertical = !_isVertical;
+          if(!_isList)
+            _isVertical = true;
+          break;
+        case 2:
+          _onLogoutClicked(context);
+          break;
+      }
+    });
+  }
+
+  SnackBar showSnackBar(String selection) {
+    return SnackBar(
+      content: Text('Selected: $selection'),
+      action: SnackBarAction(
+        label: 'Undo',
+        onPressed: () {
+          // Some code to undo the change.
+        },
+      ),
+    );
+  }
+
   @override
   void initState() {
     super.initState();
     _profileImage = preferences.getString(SharedPreference.PROFILE_IMAGE);
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -121,16 +167,25 @@ class _DashboardState extends State<Dashboard> {
                 context, Routes.editUserProfile,
                 arguments: userItem),
           ),
-          IconButton(
-            icon: Icon(Icons.power_settings_new),
-            onPressed: () => _onLogoutClicked(context),
-          )
+          PopupMenuButton(
+            icon: Icon(Icons.more_vert),
+            padding: EdgeInsets.zero,
+            onSelected: _onMenuItemSelected,
+            itemBuilder: (context) {
+              return _choicesMap.keys
+                  .map((key) => PopupMenuItem(
+                        value: key,
+                        child: Text(_choicesMap[key]),
+                      ))
+                  .toList();
+            },
+          ),
         ],
       ),
       body: Column(
         children: [
           Container(
-            height: mediaQueryH(context) * 0.07,
+            height: 60,
             padding: EdgeInsets.fromLTRB(20, 10, 20, 10),
             color: Color(0xFF5DDE5D),
             child: SearchTextField(
@@ -139,7 +194,9 @@ class _DashboardState extends State<Dashboard> {
               _onSearchChanged,
             ),
           ),
-          Expanded(child: _getAgentData()),
+          _isVertical
+              ? Expanded(child: _getAgentData())
+              : _getAgentData(),
         ],
       ),
     );

@@ -1,74 +1,43 @@
 import 'package:flutter/material.dart';
-import 'package:rent_a_tool_sample/widgets/image_widget.dart';
 
-import '../extras/extensions.dart';
+import '../extras/extras.dart';
 import '../models/agent_item.dart';
+import '../widgets/widgets.dart';
 
 class AgentData extends StatelessWidget {
   final List<dynamic> items;
+  final bool isList;
+  final bool isVertical;
 
-  AgentData(this.items);
+  AgentData(this.items, this.isList, this.isVertical);
 
   @override
   Widget build(BuildContext context) {
     return Container(
       color: Colors.white,
       child: items.length > 0
-          ? ListView.builder(
-              addAutomaticKeepAlives: true,
-              itemCount: items.length,
-              itemBuilder: (context, index) {
-                AgentItem item = AgentItem.fromJson(items[index]);
-                return Container(
-                  padding: const EdgeInsets.fromLTRB(10, 9, 10, 0),
-                  child: Card(
-                    elevation: 4,
-                    shadowColor: cardShadowColor,
-                    child: Padding(
-                      padding: const EdgeInsets.fromLTRB(10, 10, 5, 10),
-                      child: LayoutBuilder(
-                        builder: (context, constraints) {
-                          return Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              ClipRRect(
-                                borderRadius: BorderRadius.circular(5),
-                                child: ImageWidget(
-                                  imageUrl: item.agentProfile,
-                                  width: 50,
-                                  height: 50,
-                                  placeHolderImage: placeHolderImage,
-                                ),
-                              ),
-                              10.0.addWSpace(),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    item.agentName.rowTitleText(),
-                                    "${item.totalContainer} Container"
-                                        .rowSubTitleText(),
-                                    10.0.addHSpace(),
-                                    Container(
-                                      child: item.containerName.isEmpty
-                                          ? "--".rowDetailText()
-                                          : item.containerName.rowDetailText(),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              IconButton(
-                                  icon: Image.asset(arrowImage),
-                                  onPressed: () {}),
-                            ],
-                          );
-                        },
-                      ),
-                    ),
+          ? isList
+              ? Container(
+                  height: mediaQueryH(context) * 0.14,
+                  child: ListView.builder(
+                    itemCount: items.length,
+                    scrollDirection:
+                        isVertical ? Axis.vertical : Axis.horizontal,
+                    itemBuilder: (context, index) => Container(
+                        padding: const EdgeInsets.fromLTRB(10, 9, 10, 0),
+                        child: AgentListViewItem(
+                            item: AgentItem.fromJson(items[index]))),
                   ),
-                );
-              },
-            )
+                )
+              : GridView.builder(
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    childAspectRatio: 1.5,
+                  ),
+                  itemCount: items.length,
+                  itemBuilder: (context, index) =>
+                      AgentGridViewItem(item: AgentItem.fromJson(items[index])),
+                )
           : Center(
               child: Text("No data available."),
             ),

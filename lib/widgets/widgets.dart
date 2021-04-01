@@ -9,3 +9,5 @@ export '../widgets/search_text_field.dart';
 export '../widgets/sign_up_button.dart';
 export '../widgets/container_raised_button.dart';
 export '../widgets/social_sign_in_button.dart';
+export '../widgets/agent_list_view_item.dart';
+export '../widgets/agent_grid_view_item.dart';

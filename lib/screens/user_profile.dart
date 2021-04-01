@@ -12,8 +12,7 @@ import '../extras/extras.dart';
 import '../models/user_item.dart';
 
 class UserProfile extends StatefulWidget {
-  static const userProfileSizeH = 0.15;
-  static const userProfileSizeW = 0.3;
+  static const double userProfileSize = 120;
 
   @override
   _UserProfileState createState() => _UserProfileState();
@@ -48,10 +47,14 @@ class _UserProfileState extends State<UserProfile> {
 
     _overLapPaddingWidget() {
       return Container(
-        height: ((mediaQueryH(context) * UserProfile.userProfileSizeH) / 2) +
-            (_uploadImageSize / 2) -
-            (Platform.isIOS ? -8 : 4),
-        width: mediaQueryW(context) * UserProfile.userProfileSizeW,
+        // height: ((mediaQueryH(context) * UserProfile.userProfileSizeH) / 2) +
+        //     (_uploadImageSize / 2) -
+        //     (Platform.isIOS ? -8 : 4),
+        // width: mediaQueryW(context) * UserProfile.userProfileSizeW,
+
+        // 4.0 is padding from profile image to border
+        width: (UserProfile.userProfileSize - 4.0),
+        height: (UserProfile.userProfileSize / 2) + (_uploadImageSize / 2),
       );
     }
 
@@ -76,10 +79,12 @@ class _UserProfileState extends State<UserProfile> {
                       clipBehavior: Clip.none,
                       children: [
                         Container(
-                          width: mediaQueryW(context) *
-                              UserProfile.userProfileSizeW,
-                          height: mediaQueryH(context) *
-                              UserProfile.userProfileSizeH,
+                          // width: mediaQueryW(context) *
+                          //     UserProfile.userProfileSizeW,
+                          // height: mediaQueryH(context) *
+                          //     UserProfile.userProfileSizeH,
+                          width: UserProfile.userProfileSize,
+                          height: UserProfile.userProfileSize,
                           decoration: BoxDecoration(
                             border: Border.all(
                               color: secondaryColor,

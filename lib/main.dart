@@ -13,7 +13,6 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await preferences.init();
   await preferences.putAppDeviceInfo();
-  // await Firebase.initializeApp();
   runApp(MyApp());
 }
 
