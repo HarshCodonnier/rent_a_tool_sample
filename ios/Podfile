@@ -31,6 +31,7 @@ target 'Runner' do
   use_frameworks!
   use_modular_headers!
 
+  pod 'GoogleSignIn'
   flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__))
 end
 
@@ -48,10 +49,3 @@ post_install do |installer|
 #    end
   end
 end
-
-# add the Firebase pod for Google Analytics
-#pod 'Firebase/Auth'
-#pod 'Firebase/Analytics'
-pod 'GoogleSignIn'
-# add pods for any other desired Firebase products
-# https://firebase.google.com/docs/ios/setup#available-pods

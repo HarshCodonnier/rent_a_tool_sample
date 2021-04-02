@@ -6,12 +6,11 @@ import '../screens/user_distance.dart';
 import '../widgets/image_widget.dart';
 
 class AgentListViewItem extends StatelessWidget {
-  const AgentListViewItem({
-    Key key,
-    @required this.item,
-  }) : super(key: key);
+  const AgentListViewItem({Key key, @required this.item, this.isVertical})
+      : super(key: key);
 
   final AgentItem item;
+  final bool isVertical;
 
   @override
   Widget build(BuildContext context) {
@@ -33,19 +32,9 @@ class AgentListViewItem extends StatelessWidget {
               ),
             ),
             10.0.addWSpace(),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                item.agentName.rowTitleText(),
-                "${item.totalContainer} Container".rowSubTitleText(),
-                10.0.addHSpace(),
-                Container(
-                  child: item.containerName.isEmpty
-                      ? "--".rowDetailText()
-                      : item.containerName.rowDetailText(),
-                ),
-              ],
-            ),
+            isVertical
+                ? Expanded(child: ListViewDescription(item: item))
+                : ListViewDescription(item: item),
             IconButton(
                 icon: Image.asset(arrowImage),
                 onPressed: () {
@@ -59,6 +48,32 @@ class AgentListViewItem extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+class ListViewDescription extends StatelessWidget {
+  const ListViewDescription({
+    Key key,
+    @required this.item,
+  }) : super(key: key);
+
+  final AgentItem item;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        item.agentName.rowTitleText(),
+        "${item.totalContainer} Container".rowSubTitleText(),
+        10.0.addHSpace(),
+        Container(
+          child: item.containerName.isEmpty
+              ? "--".rowDetailText()
+              : item.containerName.rowDetailText(),
+        ),
+      ],
     );
   }
 }

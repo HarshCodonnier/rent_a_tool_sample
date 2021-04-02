@@ -26,7 +26,9 @@ class AgentData extends StatelessWidget {
                     itemBuilder: (context, index) => Container(
                         padding: const EdgeInsets.fromLTRB(10, 9, 10, 0),
                         child: AgentListViewItem(
-                            item: AgentItem.fromJson(items[index]))),
+                          item: AgentItem.fromJson(items[index]),
+                          isVertical: isVertical,
+                        )),
                   ),
                 )
               : GridView.builder(
